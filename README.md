@@ -25,7 +25,7 @@ This started (an continues) as a learning process... but it turned out to be a p
 
 Everything runs all together on an arduino mega with a 9V battery and is controlled via a graphical interface (in a 128x64 GLCD) and a few inputs.
 
-The midi outs are on separate midi channels for convenience, but like almost everything is a constant at the top of the arduino sketch.
+The midi outs are on separate midi channels for convenience, but (like almost everything) the channel numbers are constants at the top of the arduino sketch.
 
 Inspiration (and some code & schematics) for this project came from:
 
