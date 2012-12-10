@@ -319,7 +319,7 @@ void loop() {
 		photoResistorMax = 0;
 		photoResistorMin = 1023;
 		while(millis() < t + 2000) {
-			analogInputs.read();
+			analogInputs.read(true);
 			int read = analogInputs.get(photoResistorPin)->read;
 			photoResistorMax < read && (photoResistorMax = read);
 			photoResistorMin > read && (photoResistorMin = read);
@@ -688,13 +688,10 @@ void onChange(byte pin, int read) {
 			}
 		break;
 	}
-	switch(pin) {
-		case photoResistorPin:
-			if(!photoResistorEnabled || photoResistorCalibrate) return;
-			read = constrain(map(constrain(read, photoResistorMin, photoResistorMax), photoResistorMin, photoResistorMax, notePotEnabled ? notePotValue : 0, notePotEnabled ? notePotValue + (numNotes * 2) : (numNotes * numOctaves) - 1), 0, (numNotes * numOctaves) - 1);
-			if(synthNote == read) return;
-			setNote(read);
-		break;
+	if(pin == photoResistorPin && photoResistorEnabled && !photoResistorCalibrate) {
+		read = constrain(map(constrain(read, photoResistorMin, photoResistorMax), photoResistorMin, photoResistorMax, notePotEnabled ? notePotValue : 0, notePotEnabled ? notePotValue + (numNotes * 2) : (numNotes * numOctaves) - 1), 0, (numNotes * numOctaves) - 1);
+		if(synthNote == read) return;
+		setNote(read);
 	}
 	if((UIView == UIViewMenu || UIView == UIViewTriggers) && pin == pot1Pin) {
 		if(!chainSawEnabled && selectedMenuItem == 4) setScale(selectedScale, map(read, 0, 1023, 0, 11));
