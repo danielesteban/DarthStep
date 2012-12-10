@@ -591,7 +591,7 @@ void waveConfUI(bool force) {
 		value = "";	
 		switch(x) {
 			case 0:
-				value = waveOn & (1 << 0) ? WaveShapeNames[waves[wo].getShape()] : "Off";
+				value = waveOn & (1 << wo) ? WaveShapeNames[waves[wo].getShape()] : "Off";
 			break;
 			case 1:
 				value = "+";
@@ -602,7 +602,7 @@ void waveConfUI(bool force) {
 				value += "%";
 			break;
 			case 3:
-				value = waveOn & (1 << 1) ? WaveShapeNames[waves[wo + 1].getShape()] : "Off";
+				value = waveOn & (1 << wo + 1) ? WaveShapeNames[waves[wo + 1].getShape()] : "Off";
 			break;
 			case 4:
 				value = "+";
@@ -613,7 +613,7 @@ void waveConfUI(bool force) {
 				value += "%";
 			break;
 			case 6:
-				value = waveOn & (1 << 2) ? WaveShapeNames[waves[wo + 2].getShape()] : "Off";
+				value = waveOn & (1 << wo + 2) ? WaveShapeNames[waves[wo + 2].getShape()] : "Off";
 			break;
 			case 7:
 				value = "+";
