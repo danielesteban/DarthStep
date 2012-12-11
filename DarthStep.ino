@@ -119,7 +119,8 @@ float tempoStepFloat,
 
 unsigned long updateUILastLoop = 0,
 	chainSawLastLoop = 0,
-	selectedTempoStepLastBlink = 0;
+	selectedTempoStepLastBlink = 0,
+	photoResistorCalibrateStart = 0;
 
 Wave waves[numWaves] = {
 	Wave(WaveShapeSquare, SAMPLE.rate),
@@ -315,17 +316,15 @@ void loop() {
 	if(selectedUIView != UIView) setUIView(selectedUIView);
 	else updateUI();
 	if(photoResistorEnabled && photoResistorCalibrate) {
-		unsigned long t = millis();
-		photoResistorMax = 0;
-		photoResistorMin = 1023;
-		while(millis() < t + 2000) {
-			analogInputs.read(true);
-			int read = analogInputs.get(photoResistorPin)->read;
-			photoResistorMax < read && (photoResistorMax = read);
-			photoResistorMin > read && (photoResistorMin = read);
-			delay(10);
+		if(photoResistorCalibrateStart == 0) {
+			photoResistorCalibrateStart = millis();
+			photoResistorMax = 0;
+			photoResistorMin = 1023;
 		}
-		photoResistorCalibrate = 0;
+		int read = analogInputs.get(photoResistorPin)->read;
+		photoResistorMax < read && (photoResistorMax = read);
+		photoResistorMin > read && (photoResistorMin = read);
+		photoResistorCalibrateStart <= millis() - 1000 && (photoResistorCalibrateStart = photoResistorCalibrate = 0);
 	}
 }
 
