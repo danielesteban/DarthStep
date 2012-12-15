@@ -115,7 +115,7 @@ unsigned int tempoBpm = 120,
 	scale[numOctaves * numNotes];
 
 float tempoStepFloat,
-	tempoIncrement = (((float) numTempoSteps / 2) / (float) tempoRate) * ((float) tempoBpm / 60);
+	tempoIncrement = (((float) numTempoSteps / 8) / (float) tempoRate) * ((float) tempoBpm / 60);
 
 unsigned long updateUILastLoop = 0,
 	chainSawLastLoop = 0,
@@ -221,24 +221,24 @@ void setup() {
 
 	TCCR2A = 0;
 	TCCR2B = 0;
-	TCCR2A = _BV(WGM21); //turn on CTC mode
-	TCCR2B = _BV(CS21); //Set CS11 bit for 8 prescaler
+	TCCR2A |= (1 << WGM21); //turn on CTC mode
+	TCCR2B |= (1 << CS21); //Set CS11 bit for 8 prescaler
 	OCR2A = (F_CPU / ((long) SAMPLE.rate * 8)) - 1; //set compare match register for 16khz increments
-	TIMSK2 = _BV(OCIE2A); //enable timer compare interrupt
+	TIMSK2 |= (1 << OCIE2A); //enable timer compare interrupt
 
 	TCCR3A = 0;
 	TCCR3B = 0;
-	TCCR3B = _BV(WGM32);
-	TCCR3B = _BV(CS30); //no prescaler
+	TCCR3B |= (1 << WGM32);
+	TCCR3B |= (1 << CS30); //no prescaler
 	OCR3A = (F_CPU / tempoRate) - 1;
-	TIMSK3 = _BV(OCIE3A);
+	TIMSK3 |= (1 << OCIE3A);
 
 	TCCR4A = 0;
 	TCCR4B = 0;
-	TCCR4B = _BV(WGM42);
-	TCCR4B = _BV(CS40); //no prescaler
+	TCCR4B |= (1 << WGM42);
+	TCCR4B |= (1 << CS40); //no prescaler
 	OCR4A = (F_CPU / (tempoRate / 2)) - 1;
-	TIMSK4 = _BV(OCIE4A);
+	TIMSK4 |= (1 << OCIE4A);
 
 	sei(); //allow interrupts
 
@@ -265,7 +265,7 @@ void setup() {
 	SAMPLE.quants[4] = 32;
 	//SAMPLE.quants[5] = 32;
 	//tempoBpm = 120;
-	//tempoIncrement = (((float) numTempoSteps / 2) / (float) tempoRate) * ((float) tempoBpm / 60);
+	//tempoIncrement = (((float) numTempoSteps / 8) / (float) tempoRate) * ((float) tempoBpm / 60);
 
 	//Serial.begin(9600);
 	//Serial.println(tempoIncrement, DEC);
@@ -683,7 +683,7 @@ void onChange(byte pin, int read) {
 				read = map(read, 0, 1023, 60, 300);
 				if(tempoBpm == read) return;
 				tempoBpm = read;
-				tempoIncrement = (((float) numTempoSteps / 2) / (float) tempoRate) * ((float) tempoBpm / 60);
+				tempoIncrement = (((float) numTempoSteps / 8) / (float) tempoRate) * ((float) tempoBpm / 60);
 			}
 		break;
 	}
