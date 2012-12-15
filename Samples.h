@@ -3068,7 +3068,7 @@ class sample {
 			for(byte i=0; i<numSamples; i++) {
 				index[i] = 0;
 				gain[i] = 1 << bits;
-				quants[i] = 16;
+				quants[i] = 8;
 			}
 			on = 0;
 			alt = 0;

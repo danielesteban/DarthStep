@@ -56,7 +56,7 @@ prog_uchar scales[(numNotes - 1) * numScales] PROGMEM = {
 const String noteNames[12] = {"C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"},
 	scaleNames[numScales] = {"Aeolian", "Locrian", "Ionian", "Dorian", "Phrygian", "Lydian", "Mixolydia", "MAscMinor", "Raised6th", "Raised5th", "MjrMinor", "Altered", "Arabic"};
 
-const unsigned int tempoRate = 1024;
+const unsigned int tempoRate = 512;
 
 #define samplerInterrupt (TIMER2_COMPA_vect)
 #define tempoInterrupt (TIMER3_COMPA_vect)
@@ -261,8 +261,8 @@ void setup() {
 	sampleSteps[4][56] = 1;*/
 	//SAMPLE.quants[0] = 16;
 	//SAMPLE.quants[2] = 4;
-	SAMPLE.quants[3] = 32;
-	SAMPLE.quants[4] = 32;
+	SAMPLE.quants[3] = 16;
+	SAMPLE.quants[4] = 16;
 	//SAMPLE.quants[5] = 32;
 	//tempoBpm = 120;
 	//tempoIncrement = (((float) numTempoSteps / 8) / (float) tempoRate) * ((float) tempoBpm / 60);
