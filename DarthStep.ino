@@ -8,16 +8,18 @@
 #include <Directory.h>
 #include <Menu.h>
 #include "Synth.h"
+#include "Sampler.h"
 #include "Sequencer.h"
 
 //Constants
 const byte numSynths = 2,
 	UIViewSynth1 = 0,
 	UIViewSynth2 = 1,
-	UIViewMenu = 2,
-	UIViewSynth1Config = 3,
-	UIViewSynth2Config = 4,
-	UIViewSequenceLoader = 5,
+	UIViewSampler = 2,
+	UIViewMenu = 3,
+	UIViewSynth1Config = 4,
+	UIViewSynth2Config = 5,
+	UIViewSequenceLoader = 6,
 	pot1Pin = A8,
 	pot2Pin = A9,
 	photoResistorPin = A10;
@@ -48,6 +50,7 @@ Synth * synths[numSynths] = {
 	new Synth(sampleRate, midi),
 	new Synth(sampleRate, midi)
 };
+Sampler * sampler = new Sampler(midi);
 Sequencer sequencer(numSynths, synths);
 
 UTFT tft(ITDB32S, 38, 39, 40, 41);
@@ -63,6 +66,7 @@ String synthConfigItems[numSynthConfigItems] = {"Wave 1: Square", "Wave 2: Off",
 UI * UIViews[] = {
 	(UI *) synths[0], //UIViewSynth1
 	(UI *) synths[1], //UIViewSynth2
+	(UI *) sampler, //UIViewSampler
 	new Menu("Menu", numMenuItems, menuItems, menuOnClick), //UIViewMenu
 	new Menu("Synth 1 Config", numSynthConfigItems, synthConfigItems, synthConfigOnClick), //UIViewSynth1Config
 	new Menu("Synth 2 Config", numSynthConfigItems, synthConfigItems, synthConfigOnClick), //UIViewSynth2Config
