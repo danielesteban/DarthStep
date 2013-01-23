@@ -8,10 +8,10 @@ This started (an continues) as a learning process... but it turned out to be a p
 **Synth Features:**
 
 - Two independent 2D synths (possible even more)
-- Multiple simultaneous waves per synth (Square, Triangle, Saw or Sine).
-- Multiples scales (intervals) pre-programed.
+- Multiple simultaneous waves per synth (Square, Triangle, Saw or Sine)
+- Multiples scales (intervals) pre-programed
 - Octave selection potenciometer
-- Quick pitch alteration light resistor
+- Quick pitch alteration light resistor (NYI on the TFT version)
 - ChainSaw
 - Gain Mod
 - Midi Out
