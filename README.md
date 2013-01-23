@@ -14,7 +14,7 @@ This started (an continues) as a learning process... but it turned out to be a p
 - ChainSaw
 - Midi Out
 
-**License:**
+**Sampler Features:**
 
 - 9 Samples. 8Bits. 8khz.
 - Editable 2 bars beats. 64 steps per sample (32 each bar).
@@ -27,12 +27,22 @@ Everything runs all together on an arduino mega with a 9V battery and is control
 
 The midi outs are on separate midi channels for convenience, but (like almost everything) the channel numbers are constants at the top of the arduino sketch.
 
-**Sampler Features:**
-
-
-
-
 Inspiration (and some code & schematics) for this project came from:
 
 - http://code.google.com/p/tinkerit/wiki/Auduino
 - http://www.instructables.com/id/Electronic-Instrument
+
+**License:**
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+You should have received a copy of the [GNU General Public License](LICENSE)
+along with this program. If not, see <http://www.gnu.org/licenses/>.
