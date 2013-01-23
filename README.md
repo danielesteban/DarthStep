@@ -19,7 +19,7 @@ This started (an continues) as a learning process... but it turned out to be a p
 - Multiple simultaneous waves per synth (Square, Triangle, Saw or Sine)
 - Multiples scales (intervals) pre-programed
 - Octave selection potenciometer
-- Quick pitch alteration light resistor (NYI on the TFT version)
+- ~~Quick pitch alteration light resistor~~ (NYI on the TFT version)
 - ChainSaw
 - Gain Mod
 - Midi Out
