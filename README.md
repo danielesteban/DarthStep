@@ -1,5 +1,11 @@
-DarthStep
-=========
+      dP                   dP         dP              dP                     
+      88                   88         88              88                     
+.d888b88 .d8888b. 88d888b. 88d888b. d8888P .d8888b. d8888P .d8888b. 88d888b. 
+88'  `88 88'  `88 88'  `88 88'  `88   88   Y8ooooo.   88   88ooood8 88'  `88 
+88.  .88 88.  .88 88       88    88   88         88   88   88.  ... 88.  .88 
+`88888P8 `88888P8 dP       dP    dP   dP   `88888P'   dP   `88888P' 88Y888P' 
+                                                                    88       
+                                                                    dP       
 
 An arduino Sampler/Synthesizer.
 
