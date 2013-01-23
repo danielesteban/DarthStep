@@ -7,11 +7,13 @@ This started (an continues) as a learning process... but it turned out to be a p
 
 **Synth Features:**
 
-- Multiple simultaneous waves (Square, Triangle, Saw or Sine).
+- Two independent 2D synths (possible even more)
+- Multiple simultaneous waves per synth (Square, Triangle, Saw or Sine).
 - Multiples scales (intervals) pre-programed.
-- Note selection potenciometer
+- Octave selection potenciometer
 - Quick pitch alteration light resistor
 - ChainSaw
+- Gain Mod
 - Midi Out
 
 **Sampler Features:**
@@ -21,11 +23,14 @@ This started (an continues) as a learning process... but it turned out to be a p
 - Variable BPM
 - Multiple quantization presets.
 - Midi Out
-- I will add an SD on the near future for more samples, recording and loading/saving beats
 
-Everything runs all together on an arduino mega with a 9V battery and is controlled via a graphical interface (in a 128x64 GLCD) and a few inputs.
+Everything runs all together on an arduino mega with a 9V battery and is controlled via a graphical touch interface (in a 320x240 TFT) and a few inputs.
+
+Both the synth and the sampler allow to record/save/load sequences into an SD Card.
 
 The midi outs are on separate midi channels for convenience, but (like almost everything) the channel numbers are constants at the top of the arduino sketch.
+
+Note: The fritzing files are from the old GLCD version... I will update them as soon as I get motivated. But the main circuit is pretty much the same.
 
 Inspiration (and some code & schematics) for this project came from:
 
