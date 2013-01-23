@@ -12,11 +12,12 @@
 #include <stdlib.h>
 #include <WProgram.h>
 #endif
-#include "Synth.h"    
+#include "Synth.h"
+#include "Sampler.h"
 
 class Sequencer {
     public:
-        Sequencer(byte numSynths, Synth * synths[]);
+        Sequencer(byte numSynths, Synth * synths[], Sampler * sampler);
         void tick();
         void setTempo(unsigned int tempoBpm);
         static const byte numTempoSteps = 64;
@@ -28,6 +29,7 @@ class Sequencer {
         float _tempoStepFloat,
             _tempoIncrement;
         Synth ** _synths;
+        Sampler * _sampler;
 };
 
 #endif

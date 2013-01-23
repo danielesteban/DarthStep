@@ -56,7 +56,7 @@ Synth::Synth(int sampleRate, Midi midi) : UI() {
  	_midi = midi;
  	clearSequencer();
  	setScale(_selectedScale, _selectedRoot);
- 	addButton("");
+ 	addButton(NULL);
 	_circle[0] = _circle[1] = -1;
 }
 

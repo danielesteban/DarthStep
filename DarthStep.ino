@@ -10,6 +10,7 @@
 #include "Synth.h"
 #include "Sampler.h"
 #include "Sequencer.h"
+#include "Samples.h"
 
 //Constants
 const byte numSynths = 2,
@@ -33,7 +34,7 @@ const unsigned int sampleRate = 8000;
 
 //Vars
 byte orientation = LANDSCAPE,
-	UIView = UIViewSynth1,
+	UIView = UIViewSampler,
 	sequenceLoaderSynth;
 
 bool photoResistorEnabled = 0,
@@ -51,14 +52,14 @@ Synth * synths[numSynths] = {
 	new Synth(sampleRate, midi)
 };
 Sampler * sampler = new Sampler(midi);
-Sequencer sequencer(numSynths, synths);
+Sequencer sequencer(numSynths, synths, sampler);
 
 UTFT tft(ITDB32S, 38, 39, 40, 41);
 UTouch touch(42, 43, 44, 45, 46);
 
 //UIViews
-const byte numMenuItems = 4;
-String menuItems[numMenuItems] = {"Synth 1 -->", "Synth 1 Config -->", "Synth 2 -->", "Synth 2 Config -->"};
+const byte numMenuItems = 5;
+String menuItems[numMenuItems] = {"Sampler -->", "Synth 1 -->", "Synth 1 Config -->", "Synth 2 -->", "Synth 2 Config -->"};
 
 const byte numSynthConfigItems = 5;
 String synthConfigItems[numSynthConfigItems] = {"Wave 1: Square", "Wave 2: Off", "Wave 3: Off", "Wave 4: Off", "MidiOut: Off"};
@@ -141,7 +142,7 @@ void setup() {
 	sei(); //allow interrupts
 
 	//debug
-	Serial.begin(115200);
+	//Serial.begin(115200);
 
 	//for(byte x=0; x<numSynths; x++) {
 		//synths[x]->waveOn |= (1 << 0);
@@ -212,8 +213,8 @@ void screenMenuOnClick(byte id) {
 }
 
 void renderSequenceLoader() {
-	file * dir = getDirectory("/SEQS"),
-		* f = dir;
+	Directory * dir = new Directory("/SEQS");
+	file * f = dir->getFiles();
 
 	byte count = 0,
 		c = 0;
@@ -223,29 +224,28 @@ void renderSequenceLoader() {
 		f = f->next;
 	}
 	
-	String files[count];
+	String filenames[count];
 	
-	f = dir;
+	f = dir->getFiles();
 	while(f != NULL) {
 		if(strcmp(f->name, "LAST") != 0) {
-			files[c] = f->name;
+			filenames[c] = f->name;
 			c++;
 		}
 		f = f->next;
 	}
 
-	freeDirectory(dir);
+	delete dir;
 
 	if(UIViews[UIViewSequenceLoader] != NULL) delete UIViews[UIViewSequenceLoader];
-	UIViews[UIViewSequenceLoader] = new Menu("Load sequence", count, files, sequenceLoaderOnClick);
+	UIViews[UIViewSequenceLoader] = new Menu("Load sequence", count, filenames, sequenceLoaderOnClick);
 	sequenceLoaderSynth = UIView;
 	setUIView(UIViewSequenceLoader);
 }
 
 void sequenceLoaderOnClick(byte id) {
-	Serial.println(id);
-	file * dir = getDirectory("/SEQS"),
-		* f = dir;
+	Directory * dir = new Directory("/SEQS");
+	file * f = dir->getFiles();
 
 	byte c = -1;
 
@@ -257,20 +257,25 @@ void sequenceLoaderOnClick(byte id) {
 
 	synths[sequenceLoaderSynth]->loadSequence(f->name);
 	setUIView(sequenceLoaderSynth);
+
+	delete dir;
 }
 
 void menuOnClick(byte id) {
 	switch(id) {
 		case 0:
-			setUIView(UIViewSynth1);
+			setUIView(UIViewSampler);
 		break;
 		case 1:
-			setUIView(UIViewSynth1Config);
+			setUIView(UIViewSynth1);
 		break;
 		case 2:
-			setUIView(UIViewSynth2);
+			setUIView(UIViewSynth1Config);
 		break;
 		case 3:
+			setUIView(UIViewSynth2);
+		break;
+		case 4:
 			setUIView(UIViewSynth2Config);
 	}
 }
@@ -323,6 +328,15 @@ void onChange(byte pin, int read) {
 					synths[UIView]->setNote(read);
 			}
 		break;
+		case UIViewSampler:
+			switch(pin) {
+				case pot1Pin:
+					sampler->sampleQuantization[sampler->selectedSample] = pow(2, map(read, 0, 1023, 2, 5)) + 1;
+				break;
+				case pot2Pin:
+					sampler->selectedSample = map(read, 1023, 0, 0, numSamples - 1);
+			}
+		break;
 		case UIViewMenu:
 			switch(pin) {
 				case pot2Pin:
@@ -349,5 +363,6 @@ ISR(sequencerInterrupt) {
 ISR(audioInterrupt) {
 	int output = 127;
 	for(byte x=0; x<numSynths; x++) output += synths[x]->output();
+	output += sampler->output();
 	audioOutput = constrain(output, 0, 255);
 }

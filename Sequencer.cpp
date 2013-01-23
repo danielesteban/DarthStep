@@ -5,12 +5,13 @@
 
 #include "Sequencer.h"
 
-Sequencer::Sequencer(byte numSynths, Synth * synths[]) {
+Sequencer::Sequencer(byte numSynths, Synth * synths[], Sampler * sampler) {
     _tempoStep = 0;
     _tempoStepFloat = 0;
     setTempo(120);
     _numSynths = numSynths;
     _synths = synths;
+    _sampler = sampler;
 }
 
 void Sequencer::tick() {
@@ -19,6 +20,7 @@ void Sequencer::tick() {
         _tempoStep = (int) _tempoStepFloat;
         _tempoStep >= numTempoSteps && (_tempoStepFloat = _tempoStep = 0);
         for(byte x=0; x<_numSynths; x++) _synths[x]->sequencerTick(_tempoStep);
+        _sampler->sequencerTick(_tempoStep);
     }
 }
 
