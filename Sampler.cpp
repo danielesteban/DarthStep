@@ -36,35 +36,33 @@ void Sampler::update() {
 			_renderedSample = selectedSample;
 		}
 
+		_renderedTempoStep = _renderedQuantization = sampleQuantization[selectedSample];
 		_step_h = 40;
-		_step_w = _tft.getDisplayXSize() / sampleQuantization[selectedSample];
+		_step_w = _tft.getDisplayXSize() / _renderedQuantization;
 		_step_y = ((_tft.getDisplayYSize() - 1) / 2) - (_step_h / 2);
-		_step_m = (_tft.getDisplayXSize() - (_step_w * sampleQuantization[selectedSample])) / 2;
+		_step_m = (_tft.getDisplayXSize() - (_step_w * _renderedQuantization)) / 2;
 		_tft.setColor(0, 0, 0);
 		_tft.fillRect(0, _step_y - 2, _tft.getDisplayXSize() - 1, _step_y + _step_h + 3);
-		for(x=0; x<sampleQuantization[selectedSample]; x++) {
+		for(x=0; x<_renderedQuantization; x++) {
 			renderStep(x);
 			renderStepSelection(x);
 		}
-		_renderedTempoStep = _renderedQuantization = sampleQuantization[selectedSample];
 
-		/*UIButton * b = _buttons;
-		x = 0;
-		while(b != NULL) {
-			b->width = _step_w - 3;
-			b->height = _step_h;
-			if(x >= sampleQuantization[selectedSample]) b->x = b->y = -1;
-			else {
-				b->x = _step_m + (x * _step_w);
-				b->y = _step_y;
-			}
-			b = b->next;
-			x++;
-		}*/
+		int qx = _tft.getDisplayXSize() - 160,
+			qy = _tft.getDisplayYSize() - 17;
+
+		_tft.setColor(0, 0, 0);
+		_tft.fillRect(qx, qy, _tft.getDisplayXSize() - 1, _tft.getDisplayYSize() - 1);
+		_tft.setBackColor(0, 0, 0);
+		_tft.setColor(255, 255, 255);
+		String qt = "";
+		qt += _renderedQuantization / 2;
+		qt += "th notes";
+		_tft.print(qt, qx, qy);
 	}
 
 	if(_tempoStep != _renderedTempoStep) {
-		if(_renderedTempoStep != sampleQuantization[selectedSample]) renderStep(_renderedTempoStep);
+		if(_renderedTempoStep != _renderedQuantization) renderStep(_renderedTempoStep);
 		renderStep(_tempoStep, true);
 		_renderedTempoStep = _tempoStep;
 	}
@@ -98,7 +96,7 @@ void Sampler::sequencerTick(byte tempoStep) {
 			//TODO: MIDI STUFF...
 		}
 	}
-	_tempoStep = tempoStep * sampleQuantization[selectedSample] / numTempoSteps;
+	_tempoStep = tempoStep * _renderedQuantization / numTempoSteps;
 }
 
 void Sampler::renderStep(byte step, bool active) {
@@ -109,7 +107,7 @@ void Sampler::renderStep(byte step, bool active) {
 }
 
 void Sampler::renderStepSelection(byte step) {
-	bool selected = _sequencerSteps[selectedSample][step * numTempoSteps / sampleQuantization[selectedSample]];
+	bool selected = _sequencerSteps[selectedSample][step * numTempoSteps / _renderedQuantization];
 	if(selected) _tft.setColor(255, 255, 255);
 	else _tft.setColor(0, 0, 0);
 	int x = _step_m + (step * _step_w);
@@ -125,7 +123,7 @@ void Sampler::onTouch(byte orientation, int x, int y) {
 	byte id = ((x - _step_m) / _step_w);
 	if(_lastTouch == id) return;
 	_lastTouch = id;
-	byte step = id * numTempoSteps / sampleQuantization[selectedSample];
+	byte step = id * numTempoSteps / _renderedQuantization;
 
 	_sequencerSteps[selectedSample][step] = !_sequencerSteps[selectedSample][step];
 	renderStepSelection(id);
