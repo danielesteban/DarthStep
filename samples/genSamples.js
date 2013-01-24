@@ -18,8 +18,8 @@ function genSamples() {
 			i > 0 && samplesFile.write(", ");
 			samplesFile.write('"' + name + '"');
 		});
-		samplesFile.write("};\n\nextern const unsigned char * samples[numSamples];");
-		samplesCFile.write("\nconst unsigned char * samples[numSamples] = {");
+		samplesFile.write("};\n\nextern const char * samples[numSamples];");
+		samplesCFile.write("\nconst char * samples[numSamples] = {");
 		sampleNames.forEach(function(name, i) {
 			i > 0 && samplesCFile.write(", ");
 			samplesCFile.write(name);
@@ -58,11 +58,16 @@ function genSamples() {
 				w = w.substr(0, w.indexOf(", }"));
 				//w = eval("new Buffer([" + w + "])");
 				//fs.writeFileSync('./smp/' + fn + '.smp', w);
-				samplesCFile.write("prog_uchar " + fn.toUpperCase() + "[] PROGMEM = {");
-				samplesCFile.write(w);
-				samplesCFile.write("};\n");
-				sampleNames.push(fn.toUpperCase());
 				fs.unlinkSync('./wav/' + fn + '.h');
+				fn = fn.substr(2).toUpperCase();
+				samplesCFile.write("prog_char " + fn.toUpperCase() + "[] PROGMEM = {");
+				w = JSON.parse("[" + w + "]");
+				w.forEach(function(b, i) {
+					if(i > 0) samplesCFile.write(",");
+					samplesCFile.write(127 - parseInt(b, 10));
+				});
+				samplesCFile.write("};\n");
+				sampleNames.push(fn);
 				console.log(fn);
 				genSamples();
 			});

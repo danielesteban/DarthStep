@@ -8,8 +8,8 @@ const unsigned int sampleSize = 5000;
 
 const byte numSamples = 9;
 
-const String sampleNames[numSamples] = {"BDRUM", "CRASH", "HIHATC", "HIHATO", "RAID", "SNARE", "STICK", "TOMH", "TOML"};
+const String sampleNames[numSamples] = {"BASSDRUM", "SNARE", "STICK", "HI-HAT CLOSED", "HI-HAT OPEN", "HIGH TOM", "FLOOR TOM", "RAID", "CRASH"};
 
-extern const unsigned char * samples[numSamples];
+extern const char * samples[numSamples];
 
 #endif

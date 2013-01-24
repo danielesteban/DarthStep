@@ -362,7 +362,7 @@ ISR(sequencerInterrupt) {
 
 ISR(audioInterrupt) {
 	int output = 127;
-	for(byte x=0; x<numSynths; x++) output += synths[x]->output();
 	output += sampler->output();
+	for(byte x=0; x<numSynths; x++) output += synths[x]->output();
 	audioOutput = constrain(output, 0, 255);
 }

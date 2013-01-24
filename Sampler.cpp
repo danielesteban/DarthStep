@@ -76,7 +76,7 @@ int Sampler::output() {
 			_sampleOn &= ~(1 << x);
 			//if(samplerMidiEnabled) midi.sendNoteOff(sampleMidi[i], map(SAMPLE.gain[i], 0, 1 << SAMPLE.bits, 0, 127), samplerMidiChannel);
 		} else {
-			output += 127 - pgm_read_byte_near(samples[x] + _sampleIndex[x]);
+			output += (signed char) pgm_read_byte_near(samples[x] + _sampleIndex[x]);
 			//output += (long) (127 - pgm_read_byte_near(samples[SAMPLE.alt & (1 << i) ? 1 : 0][i] + SAMPLE.index[i])) * SAMPLE.gain[i];
 			_sampleIndex[x]++;
 		}
