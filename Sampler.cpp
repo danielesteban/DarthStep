@@ -10,7 +10,7 @@ Sampler::Sampler(Midi midi) {
 	_midi = midi;
 	selectedSample = _sampleOn = 0;
 	for(x=0; x<numSamples; x++) {
-		sampleQuantization[selectedSample] = 8;
+		sampleQuantization[x] = 8;
 		for(byte s=0; s<numTempoSteps; s++) _sequencerSteps[x][s] = 0;
 	}
 }
