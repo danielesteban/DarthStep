@@ -19,7 +19,7 @@ This started (an continues) as a learning process... but it turned out to be a p
 - Multiple simultaneous waves per synth (Square, Triangle, Saw or Sine)
 - Multiples scales (intervals) pre-programed
 - Octave selection potenciometer
-- Quick pitch alteration light resistor (NYI on the TFT version)
+- ~~Quick pitch alteration light resistor~~ (NYI on the TFT version)
 - ChainSaw
 - Gain Mod
 - Midi Out
@@ -57,5 +57,5 @@ but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 GNU General Public License for more details.
 
-You should have received a copy of the [GNU General Public License](LICENSE)
+You should have received a copy of the [GNU General Public License](https://github.com/dEsteban/DarthStep/blob/master/LICENSE)
 along with this program. If not, see <http://www.gnu.org/licenses/>.
