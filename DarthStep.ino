@@ -34,7 +34,7 @@ const unsigned int sampleRate = 8000;
 
 //Vars
 byte orientation = LANDSCAPE,
-	UIView = UIViewSampler,
+	UIView = UIViewMenu,
 	sequenceLoaderSynth;
 
 bool photoResistorEnabled = 0,
