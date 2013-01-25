@@ -21,7 +21,7 @@ class Sequencer {
         void tick();
         void setTempo(unsigned int tempoBpm);
         static const byte numTempoSteps = 64;
-        static const unsigned int rate = 512;
+        static const unsigned int rate = 1024;
     private:
         byte _numSynths,
             _tempoStep;
