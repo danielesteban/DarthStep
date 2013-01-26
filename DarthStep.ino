@@ -217,6 +217,14 @@ void screenMenuOnClick(byte id) {
 				case 4:
 					sampler->midiToggle();
 			}
+		break;
+		case UIViewSequenceLoader:
+			switch(id) {
+				case 4:
+					setUIView(sequenceLoaderSynth);
+					delete UIViews[UIViewSequenceLoader];
+					UIViews[UIViewSequenceLoader] = NULL;
+			}
 	}
 }
 
