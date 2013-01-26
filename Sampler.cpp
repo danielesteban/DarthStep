@@ -74,7 +74,8 @@ int Sampler::output() {
 		if(!(_sampleOn & (1 << x))) continue;
 		if(_sampleIndex[x] == sampleSize){
 			_sampleOn &= ~(1 << x);
-			//if(samplerMidiEnabled) midi.sendNoteOff(sampleMidi[i], map(SAMPLE.gain[i], 0, 1 << SAMPLE.bits, 0, 127), samplerMidiChannel);
+			if(_midiEnabled) _midi.sendNoteOff(samplesMidi[x], 100, _midiChannel);
+			//if(_midiEnabled) _midi.sendNoteOff(samplesMidi[x], map(sampleGain[x], 0, 1 << _sampleBits, 0, 127), _midiChannel);
 		} else {
 			output += (signed char) pgm_read_byte_near(samples[x] + _sampleIndex[x]);
 			//output += (long) (127 - pgm_read_byte_near(samples[SAMPLE.alt & (1 << i) ? 1 : 0][i] + SAMPLE.index[i])) * SAMPLE.gain[i];
@@ -90,13 +91,19 @@ void Sampler::sequencerTick(byte tempoStep) {
 	for(byte x=0; x<numSamples; x++) {
 		if(_sequencerSteps[x][tempoStep]) {
 			_sampleIndex[x] = 0;
-			//if(samplerMidiEnabled && SAMPLE.on & (1 << i)) midi.sendNoteOff(sampleMidi[i], map(SAMPLE.gain[i], 0, 1 << SAMPLE.bits, 0, 127), samplerMidiChannel);
+			if(_midiEnabled && _sampleOn & (1 << x)) _midi.sendNoteOff(samplesMidi[x], 100, _midiChannel);
+			//if(_midiEnabled && _sampleOn & (1 << x)) _midi.sendNoteOff(samplesMidi[x], map(sampleGain[x], 0, 1 << _sampleBits, 0, 127), _midiChannel);
 			_sampleOn |= (1 << x);
-			//if(samplerMidiEnabled) midi.sendNoteOn(sampleMidi[i], map(SAMPLE.gain[i], 0, 1 << SAMPLE.bits, 0, 127), samplerMidiChannel);
-			//TODO: MIDI STUFF...
+			if(_midiEnabled) _midi.sendNoteOn(samplesMidi[x], 100, _midiChannel);
+			//if(_midiEnabled) _midi.sendNoteOn(samplesMidi[x], map(sampleGain[x], 0, 1 << _sampleBits, 0, 127), _midiChannel);
 		}
 	}
 	_tempoStep = tempoStep * _renderedQuantization / numTempoSteps;
+}
+
+bool Sampler::midiToggle() {
+	_midiEnabled = !_midiEnabled;
+	return _midiEnabled;
 }
 
 void Sampler::renderStep(byte step, bool active) {

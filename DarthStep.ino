@@ -209,6 +209,12 @@ void screenMenuOnClick(byte id) {
 					if(synths[UIView]->sequencerStatus == 2) synths[UIView]->clearSequencer();
 					else synths[UIView]->sequencerStatus++;
 			}
+		break;
+		case UIViewSampler:
+			switch(id) {
+				case 4:
+					sampler->midiToggle();
+			}
 	}
 }
 

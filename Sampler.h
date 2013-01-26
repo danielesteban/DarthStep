@@ -26,13 +26,16 @@ class Sampler : public UI {
         void loadSamples();
         int output();
         void sequencerTick(byte tempoStep);
-        void renderStep(byte step, bool active = false);
-        void renderStepSelection(byte step);
+        bool midiToggle();
         byte selectedSample,
             sampleQuantization[numSamples];
     private:
         UTFT _tft;
 		Midi _midi;
+
+        static const byte _sampleBits = 8,
+            _midiChannel = 1;
+
 		byte _renderedSample,
 			_tempoStep,
             _renderedTempoStep,
@@ -49,8 +52,11 @@ class Sampler : public UI {
 
 		static const byte numTempoSteps = 64; //This should be Sequencer::numTempoSteps
 
-		bool _sequencerSteps[numSamples][numTempoSteps];
+		bool _sequencerSteps[numSamples][numTempoSteps],
+            _midiEnabled;
 
+        void renderStep(byte step, bool active = false);
+        void renderStepSelection(byte step);
         void onTouch(byte orientation, int x, int y);
         void onTouchEnd();
 };
