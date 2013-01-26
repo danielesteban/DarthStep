@@ -214,7 +214,7 @@ void screenMenuOnClick(byte id) {
 		break;
 		case UIViewSampler:
 			switch(id) {
-				case 4:
+				case 3:
 					sampler->midiToggle();
 			}
 		break;
