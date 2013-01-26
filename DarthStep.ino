@@ -8,6 +8,7 @@
 #include <Directory.h>
 #include <Menu.h>
 #include "Synth.h"
+#include "SynthConfig.h"
 #include "Sampler.h"
 #include "Sequencer.h"
 #include "Samples.h"
@@ -20,9 +21,8 @@ const byte numSynths = 2,
 	UIViewSynth2 = 1,
 	UIViewSampler = 2,
 	UIViewMenu = 3,
-	UIViewSynth1Config = 4,
-	UIViewSynth2Config = 5,
-	UIViewSequenceLoader = 6,
+	UIViewSynthConfig = 4,
+	UIViewSequenceLoader = 5,
 	pot1Pin = A8,
 	pot2Pin = A9,
 	photoResistorPin = A10;
@@ -60,19 +60,15 @@ UTFT tft(ITDB32S, 38, 39, 40, 41);
 UTouch touch(42, 43, 44, 45, 46);
 
 //UIViews
-const byte numMenuItems = 5;
-String menuItems[numMenuItems] = {"Sampler -->", "Synth 1 -->", "Synth 1 Config -->", "Synth 2 -->", "Synth 2 Config -->"};
-
-const byte numSynthConfigItems = 5;
-String synthConfigItems[numSynthConfigItems] = {"Wave 1: Square", "Wave 2: Off", "Wave 3: Off", "Wave 4: Off", "MidiOut: Off"};
+const byte numMenuItems = 3;
+String menuItems[numMenuItems] = {"Sampler -->", "Synth 1 -->", "Synth 2 -->"};
 
 UI * UIViews[] = {
 	(UI *) synths[0], //UIViewSynth1
 	(UI *) synths[1], //UIViewSynth2
 	(UI *) sampler, //UIViewSampler
 	new Menu("Menu", numMenuItems, menuItems, menuOnClick), //UIViewMenu
-	new Menu("Synth 1 Config", numSynthConfigItems, synthConfigItems, synthConfigOnClick), //UIViewSynth1Config
-	new Menu("Synth 2 Config", numSynthConfigItems, synthConfigItems, synthConfigOnClick), //UIViewSynth2Config
+	NULL, //UIViewSynthConfig
 	NULL //UIViewSequenceLoader
 };
 
@@ -143,19 +139,12 @@ void setup() {
 
 	sei(); //allow interrupts
 
-	//debug
-	//Serial.begin(115200);
-
-	//for(byte x=0; x<numSynths; x++) {
-		//synths[x]->waveOn |= (1 << 0);
-		//synths[x]->waveOn |= (1 << 1);
-	//}
-
-	//synth->chainSawToggle();
-	//synth->waves[0]->setShape(WaveShapeSine);
-	//synth->waves[1]->setShape(WaveShapeSine);
-	
 	setUIView(UIView);
+
+	//debug
+	Serial.begin(115200);
+	setUIView(UIViewSynth1);
+	renderSynthConfig();
 }
 
 void loop(void) {
@@ -193,16 +182,17 @@ void screenMenuOnClick(byte id) {
 		case UIViewSynth2:
 			switch(id) {
 				case 1:
-					synths[UIView]->chainSawToggle();
+					renderSynthConfig();
 				break;
 				case 2:
-					synths[UIView]->gainModToggle();
+					renderSequenceLoader();
 				break;
 				case 3:
-					renderSequenceLoader();
+					synths[UIView]->saveSequence();
 					
-					//synths[UIView]->saveSequence();
-					
+					//synths[UIView]->chainSawToggle();
+					//synths[UIView]->gainModToggle();
+
 					//photoResistorCalibrate = 1;
 					//photoResistorEnabled = !photoResistorEnabled;
 					//if(!photoResistorEnabled && !notePotEnabled) synths[UIView]->setNote(255);
@@ -212,12 +202,26 @@ void screenMenuOnClick(byte id) {
 					else synths[UIView]->sequencerStatus++;
 			}
 		break;
+		case UIViewSynthConfig:
+			switch(id) {
+				case 4:
+					setUIView(((SynthConfig *) UIViews[UIViewSynthConfig])->_synth == synths[0] ? UIViewSynth1 : UIViewSynth2); //Lame!
+					delete UIViews[UIViewSynthConfig];
+					UIViews[UIViewSynthConfig] = NULL;
+			}
+		break;
 		case UIViewSampler:
 			switch(id) {
 				case 4:
 					sampler->midiToggle();
 			}
 	}
+}
+
+void renderSynthConfig() {
+	if(UIViews[UIViewSynthConfig] != NULL) delete UIViews[UIViewSynthConfig];
+	UIViews[UIViewSynthConfig] = new SynthConfig(synths[UIView]);
+	setUIView(UIViewSynthConfig);
 }
 
 void renderSequenceLoader() {
@@ -278,17 +282,12 @@ void menuOnClick(byte id) {
 			setUIView(UIViewSynth1);
 		break;
 		case 2:
-			setUIView(UIViewSynth1Config);
-		break;
-		case 3:
 			setUIView(UIViewSynth2);
 		break;
-		case 4:
-			setUIView(UIViewSynth2Config);
 	}
 }
 
-void synthConfigOnClick(byte id) {
+/*void synthConfigOnClick(byte id) {
 	byte v;
 	String s;
 	Synth * synth = synths[UIView == UIViewSynth1Config ? 0 : 1];
@@ -316,7 +315,7 @@ void synthConfigOnClick(byte id) {
 			}
 			((Menu *) UIViews[UIView])->setLabel(id, s);
 	}
-}
+}*/
 
 void onChange(byte pin, int read) {
 	switch(UIView) {

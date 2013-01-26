@@ -37,8 +37,8 @@ Synth::Synth(int sampleRate, Midi midi, byte midiChannel) : UI() {
  		waves[x] = new Wave(WaveShapeSquare, sampleRate);
  	}
  	selectedNote = note;
- 	_chainSaw = _chainSawEnabled = _chainSawInterval = _chainSawLastLoop = _midiEnabled = _hold = _gainModEnabled = _selectedRoot = _tempoStep = 0; //_holding = 0;
- 	_selectedOctave = _selectedScale = 1;
+ 	axis[0] = _chainSaw = _chainSawEnabled = _chainSawInterval = _chainSawLastLoop = _midiEnabled = _selectedRoot = _tempoStep = 0;
+ 	axis[1] = _selectedOctave = _selectedScale = 1;
 	_waveNoteOffset[0] = 0;
 	_waveNoteOffset[1] = 7;
 	_waveNoteOffset[2] = 12;
@@ -47,7 +47,6 @@ Synth::Synth(int sampleRate, Midi midi, byte midiChannel) : UI() {
  	_midiChannel = midiChannel;
  	clearSequencer();
  	setScale(_selectedScale, _selectedRoot);
- 	addButton(NULL);
 	_circle[0] = _circle[1] = -1;
 }
 
@@ -119,7 +118,6 @@ int Synth::output() {
 }
 
 void Synth::chainSawTick() {
-	//if(!_chainSawEnabled || !waveOn || (!_hold && !_holding)) return;
 	if(!_chainSawEnabled || !waveOn || note == 255) return;
 	unsigned long t = millis();
 	if(t >= _chainSawLastLoop + _chainSawInterval) {
@@ -138,7 +136,7 @@ void Synth::chainSawTick() {
 	}
 }
 
-void Synth::chainSawToggle() {
+/*void Synth::chainSawToggle() {
 	_chainSawEnabled = !_chainSawEnabled;
 	if(_chainSawEnabled) return;
 	_chainSaw = false;
@@ -146,7 +144,7 @@ void Synth::chainSawToggle() {
 		if(!(waveOn & (1 << x))) continue;
 		_midi.sendNoteOn(_scale[note] + _waveNoteOffset[x], map(waveGain[x], 0, 1 << _sampleBits, 0, 127), _midiChannel);
 	}
-}
+}*/
 
 bool Synth::midiToggle() {
 	_midiEnabled = !_midiEnabled;
@@ -157,26 +155,9 @@ bool Synth::midiToggle() {
 	return _midiEnabled;
 }
 
-void Synth::holdToggle() {
-	_hold = !_hold;
-	_chainSaw = !_hold;
-	_holding = _hold;
-	setHoldArea();
-}
-
-void Synth::setHoldArea() {
-	if(_hold) {
-		_buttons->x = _buttons->y = _buttons->width = _buttons->height = -1;
-		return;
-	}
-	_buttons->x = _buttons->y = 0;
-	_buttons->width = _tft.getDisplayXSize() - 1;
-	_buttons->height = _tft.getDisplayYSize() - 1;	
-}
-
-void Synth::gainModToggle() {
+/*void Synth::gainModToggle() {
 	_gainModEnabled = !_gainModEnabled;
-}
+}*/
 
 void Synth::sequencerTick(byte tempoStep) {
 	switch(sequencerStatus) {
@@ -184,10 +165,9 @@ void Synth::sequencerTick(byte tempoStep) {
 		
 		break;
 		case 1: //recording
-			//if(_hold || _holding) {
 			if(selectedNote != 255) {
 				_sequencerSteps[tempoStep].note = selectedNote;
-				_gainModEnabled && (_sequencerSteps[tempoStep].gain = gain);
+				//_gainModEnabled && (_sequencerSteps[tempoStep].gain = gain);
 				_chainSawEnabled && (_sequencerSteps[tempoStep].chainSawInterval = _chainSawInterval);
 				_sequencerSteps[tempoStep].circle[0] = _circle[0];
 				_sequencerSteps[tempoStep].circle[1] = _circle[1];
@@ -196,7 +176,7 @@ void Synth::sequencerTick(byte tempoStep) {
 		case 2: //playing
 			if(selectedNote == 255) {
 				if(_sequencerSteps[tempoStep].note != note) setNote(_sequencerSteps[tempoStep].note);
-				_gainModEnabled && (gain = _sequencerSteps[tempoStep].gain);
+				//_gainModEnabled && (gain = _sequencerSteps[tempoStep].gain);
 				_chainSawEnabled && (_chainSawInterval = _sequencerSteps[tempoStep].chainSawInterval);
 				_circle[0] = _sequencerSteps[tempoStep].circle[0];
 				_circle[1] = _sequencerSteps[tempoStep].circle[1];
@@ -321,7 +301,6 @@ void Synth::render(UTFT tft) {
 	_renderedScale = 255;
 	_renderedCircle[0] = -1;
 	_renderedCircle[1] = -1;
-	setHoldArea();
 	update();
 }
 
@@ -336,7 +315,7 @@ void Synth::onTouch(byte orientation, int x, int y) {
 	selectedNote = map(orientation == PORTRAIT ? y : x, (orientation == PORTRAIT ? _tft.getDisplayYSize() - 1 : 0), (orientation == PORTRAIT ? 0 : _tft.getDisplayXSize() - 1), numNotes * _selectedOctave, (numNotes * (_selectedOctave + 2)) - 1);
 	if(note != selectedNote) setNote(selectedNote);
 	_chainSawEnabled && (_chainSawInterval = map(orientation == PORTRAIT ? x : y, (orientation == PORTRAIT ? 0 : _tft.getDisplayYSize() - 1), (orientation == PORTRAIT ? _tft.getDisplayXSize() - 1 : 0), 250, 10));
-	_gainModEnabled && (gain = map(orientation == PORTRAIT ? x : y, (orientation == PORTRAIT ? 0 : _tft.getDisplayYSize() - 1), (orientation == PORTRAIT ? _tft.getDisplayXSize() - 1 : 0), 0, (1 << _sampleBits) / 4));
+	(axis[0] == 1 || axis[1] == 1) && (gain = map(axis[0] == 1 ? x : y, (axis[0] ? 0 : _tft.getDisplayYSize() - 1), (axis[0] ? _tft.getDisplayXSize() - 1 : 0), 0, (1 << _sampleBits) / 4));
 	x < 10 && (x = 10);
 	x > _tft.getDisplayXSize() - 11 && (x = _tft.getDisplayXSize() - 11);
 	y < 10 && (y = 10);
@@ -344,6 +323,14 @@ void Synth::onTouch(byte orientation, int x, int y) {
 	//if(abs(x - _circle[0]) < 2 || abs(y - _circle[1]) < 2) return; 
 	_circle[0] = x;
 	_circle[1] = y;
+}
+
+void Synth::onTouchEnd() {
+	selectedNote = 255;
+	setNote(selectedNote);
+	_circle[0] = -1;
+	_circle[1] = -1;
+	//_chainSaw = true;
 }
 
 void Synth::renderNote() {
@@ -413,16 +400,3 @@ void Synth::renderTimeline() {
 	_tft.fillRect(x, 0, x + _timelineW, 5);
 }
 
-/*void Synth::onDown(byte id) {
-	_chainSaw = false;
-	_holding = true;
-}*/
-
-void Synth::onClick(byte id) {
-	selectedNote = 255;
-	setNote(selectedNote);
-	_circle[0] = -1;
-	_circle[1] = -1;
-	//_chainSaw = true;
-	//_holding = false;
-}

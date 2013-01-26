@@ -34,10 +34,7 @@ class Synth : public UI {
         void setOctave(byte id);
         int output();
         void chainSawTick();
-        void chainSawToggle();
         bool midiToggle();
-        void holdToggle();
-        void gainModToggle();
         void sequencerTick(byte tempoStep);
         void clearSequencer();
         void saveSequence();
@@ -51,7 +48,8 @@ class Synth : public UI {
         byte note,
             selectedNote,
             waveOn,
-            sequencerStatus;
+            sequencerStatus,
+            axis[2];
 
         unsigned int gain,
             waveGain[numWaves];
@@ -73,10 +71,7 @@ class Synth : public UI {
 
         bool _chainSaw, 
             _chainSawEnabled,
-            _midiEnabled,
-            _hold,
-            _holding,
-            _gainModEnabled;
+            _midiEnabled;
             
 		int _output,
             _circle[2],
@@ -96,11 +91,9 @@ class Synth : public UI {
         byte _tempoStep,
             _renderedTempoStep;
 
-        void setHoldArea();
         void setScale(byte id, byte root);
         void onTouch(byte orientation, int x, int y);
-        //void onDown(byte id);
-        void onClick(byte id);
+        void onTouchEnd();
         void renderCircle();
 		void renderNote();
         void renderTimeline();
