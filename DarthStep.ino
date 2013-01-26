@@ -14,6 +14,8 @@
 
 //Constants
 const byte numSynths = 2,
+	samplerMidiChannel = 1,
+	synthsMidiChannels[numSynths] = {2, 3},
 	UIViewSynth1 = 0,
 	UIViewSynth2 = 1,
 	UIViewSampler = 2,
@@ -48,10 +50,10 @@ unsigned long photoResistorCalibrateStart = 0;
 AnalogInputs analogInputs(onChange);
 Midi midi(Serial1);
 Synth * synths[numSynths] = {
-	new Synth(sampleRate, midi),
-	new Synth(sampleRate, midi)
+	new Synth(sampleRate, midi, synthsMidiChannels[0]),
+	new Synth(sampleRate, midi, synthsMidiChannels[1])
 };
-Sampler * sampler = new Sampler(midi);
+Sampler * sampler = new Sampler(midi, samplerMidiChannel);
 Sequencer sequencer(numSynths, synths, sampler);
 
 UTFT tft(ITDB32S, 38, 39, 40, 41);

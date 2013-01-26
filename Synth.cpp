@@ -26,7 +26,7 @@ prog_uchar scales[(Synth::numNotes - 1) * Synth::numScales] PROGMEM = {
 const String noteNames[12] = {"C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"},
 	scaleNames[Synth::numScales] = {"Aeolian", "Locrian", "Ionian", "Dorian", "Phrygian", "Lydian", "Mixolydia", "MAscMinor", "Raised6th", "Raised5th", "MjrMinor", "Altered", "Arabic"};
 
-Synth::Synth(int sampleRate, Midi midi) : UI() {
+Synth::Synth(int sampleRate, Midi midi, byte midiChannel) : UI() {
 	byte x;
 	note = 255;
 	waveOn = 1;
@@ -54,6 +54,7 @@ Synth::Synth(int sampleRate, Midi midi) : UI() {
 	_waveNoteOffset[3] = 16;
 	_tempoStep = 0;
  	_midi = midi;
+ 	_midiChannel = midiChannel;
  	clearSequencer();
  	setScale(_selectedScale, _selectedRoot);
  	addButton(NULL);

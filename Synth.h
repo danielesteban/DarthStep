@@ -26,7 +26,7 @@ typedef struct synthSequence {
 
 class Synth : public UI {
     public:
-        Synth(int sampleRate, Midi midi);
+        Synth(int sampleRate, Midi midi, byte midiChannel);
         void render(UTFT tft);
         void update();
         void setScale(byte id);
@@ -61,10 +61,10 @@ class Synth : public UI {
         UTFT _tft;
 		Midi _midi;
 
-        static const byte _sampleBits = 8,
-            _midiChannel = 2;
+        static const byte _sampleBits = 8;
 
-        byte _selectedOctave,
+        byte _midiChannel, 
+            _selectedOctave,
             _selectedScale,
             _selectedRoot,
             _waveNoteOffset[numWaves],

@@ -5,9 +5,10 @@
 
 #include "Sampler.h"
 
-Sampler::Sampler(Midi midi) {
+Sampler::Sampler(Midi midi, byte midiChannel) {
 	byte x;
 	_midi = midi;
+	_midiChannel = midiChannel;
 	selectedSample = _sampleOn = 0;
 	for(x=0; x<numSamples; x++) {
 		sampleQuantization[x] = 8;

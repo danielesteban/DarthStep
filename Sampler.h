@@ -20,7 +20,7 @@
 
 class Sampler : public UI {
     public:
-        Sampler(Midi midi);
+        Sampler(Midi midi, byte midiChannel);
         void render(UTFT tft);
         void update();
         void loadSamples();
@@ -33,10 +33,10 @@ class Sampler : public UI {
         UTFT _tft;
 		Midi _midi;
 
-        static const byte _sampleBits = 8,
-            _midiChannel = 1;
+        static const byte _sampleBits = 8;
 
-		byte _renderedSample,
+		byte _midiChannel, 
+            _renderedSample,
 			_tempoStep,
             _renderedTempoStep,
             _renderedQuantization,
@@ -45,7 +45,7 @@ class Sampler : public UI {
 			_step_h,
 			_step_y,
 			_step_m,
-            _lastTouch;
+            _lastTouch,;
 
         unsigned int _sampleIndex[numSamples],
             _sampleOn;
