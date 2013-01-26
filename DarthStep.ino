@@ -139,11 +139,11 @@ void setup() {
 
 	sei(); //allow interrupts
 
-	setUIView(UIView);
+	//setUIView(UIView);
 
 	//debug
-	Serial.begin(115200);
-	setUIView(UIViewSynth1);
+	//Serial.begin(115200);
+	UIView = UIViewSynth1;
 	renderSynthConfig();
 }
 
@@ -182,7 +182,8 @@ void screenMenuOnClick(byte id) {
 		case UIViewSynth2:
 			switch(id) {
 				case 1:
-					renderSynthConfig();
+					if(synths[UIView]->sequencerStatus == 2) synths[UIView]->clearSequencer();
+					else synths[UIView]->sequencerStatus++;
 				break;
 				case 2:
 					renderSequenceLoader();
@@ -198,8 +199,7 @@ void screenMenuOnClick(byte id) {
 					//if(!photoResistorEnabled && !notePotEnabled) synths[UIView]->setNote(255);
 				break;
 				case 4:
-					if(synths[UIView]->sequencerStatus == 2) synths[UIView]->clearSequencer();
-					else synths[UIView]->sequencerStatus++;
+					renderSynthConfig();
 			}
 		break;
 		case UIViewSynthConfig:

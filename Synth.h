@@ -20,7 +20,7 @@
 typedef struct synthSequence { 
     byte note;
     unsigned int gain;
-    unsigned int chainSawInterval;
+    byte chainSawInterval;
     int circle[2];
 } synthSequence;
 
@@ -67,18 +67,18 @@ class Synth : public UI {
             _selectedRoot,
             _waveNoteOffset[numWaves],
             _renderedNote,
-            _renderedScale;
+            _renderedScale,
+            _chainSawInterval;
 
-        bool _chainSaw, 
-            _chainSawEnabled,
+        bool _touching, 
+            _chainSaw,
             _midiEnabled;
             
 		int _output,
             _circle[2],
             _renderedCircle[2];
 
-        unsigned int _chainSawInterval,
-            _scale[numOctaves * numNotes];
+        unsigned int _scale[numOctaves * numNotes];
 
         unsigned long _chainSawLastLoop;
 
