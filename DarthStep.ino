@@ -12,20 +12,22 @@
 #include "Sampler.h"
 #include "Sequencer.h"
 #include "Samples.h"
+#include "License.h"
 
 //Constants
 const byte numSynths = 2,
 	samplerMidiChannel = 1,
 	synthsMidiChannels[numSynths] = {2, 3},
+	pot1Pin = A8,
+	pot2Pin = A9,
+	photoResistorPin = A10,
 	UIViewSynth1 = 0,
 	UIViewSynth2 = 1,
 	UIViewSampler = 2,
 	UIViewMenu = 3,
 	UIViewSynthConfig = 4,
 	UIViewSequenceLoader = 5,
-	pot1Pin = A8,
-	pot2Pin = A9,
-	photoResistorPin = A10;
+	UIViewLicense = 6;
 
 const unsigned int sampleRate = 8000;
 
@@ -60,8 +62,8 @@ UTFT tft(ITDB32S, 38, 39, 40, 41);
 UTouch touch(42, 43, 44, 45, 46);
 
 //UIViews
-const byte numMenuItems = 3;
-String menuItems[numMenuItems] = {"Sampler -->", "Synth 1 -->", "Synth 2 -->"};
+const byte numMenuItems = 4;
+String menuItems[numMenuItems] = {"Sampler -->", "Synth 1 -->", "Synth 2 -->", "License -->"};
 
 UI * UIViews[] = {
 	(UI *) synths[0], //UIViewSynth1
@@ -69,7 +71,8 @@ UI * UIViews[] = {
 	(UI *) sampler, //UIViewSampler
 	new Menu("Menu", numMenuItems, menuItems, menuOnClick), //UIViewMenu
 	NULL, //UIViewSynthConfig
-	NULL //UIViewSequenceLoader
+	NULL, //UIViewSequenceLoader
+	NULL //UIViewLicense
 };
 
 void setOrientation(byte o, bool redraw = true) {
@@ -282,6 +285,9 @@ void menuOnClick(byte id) {
 		case 2:
 			setUIView(UIViewSynth2);
 		break;
+		case 3:
+			UIViews[UIViewLicense] == NULL && (UIViews[UIViewLicense] = new License());
+			setUIView(UIViewLicense);
 	}
 }
 
