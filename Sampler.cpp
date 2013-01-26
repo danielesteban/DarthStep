@@ -102,9 +102,8 @@ void Sampler::sequencerTick(byte tempoStep) {
 	_tempoStep = tempoStep * _renderedQuantization / numTempoSteps;
 }
 
-bool Sampler::midiToggle() {
+void Sampler::midiToggle() {
 	_midiEnabled = !_midiEnabled;
-	return _midiEnabled;
 }
 
 void Sampler::renderStep(byte step, bool active) {

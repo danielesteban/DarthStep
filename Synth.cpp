@@ -137,13 +137,12 @@ void Synth::chainSawTick() {
 	}
 }
 
-bool Synth::midiToggle() {
+void Synth::midiToggle() {
 	_midiEnabled = !_midiEnabled;
 	if(!_midiEnabled && !_chainSaw && note != 255) for(byte x=0; x<numWaves; x++) {
 		if(!(waveOn & (1 << x))) continue;
 		_midi.sendNoteOff(_scale[note] + _waveNoteOffset[x], map(waveGain[x], 0, 1 << _sampleBits, 0, 127), _midiChannel);
 	}
-	return _midiEnabled;
 }
 
 void Synth::sequencerTick(byte tempoStep) {

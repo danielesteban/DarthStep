@@ -34,7 +34,7 @@ class Synth : public UI {
         void setOctave(byte id);
         int output();
         void chainSawTick();
-        bool midiToggle();
+        void midiToggle();
         void sequencerTick(byte tempoStep);
         void clearSequencer();
         void saveSequence();

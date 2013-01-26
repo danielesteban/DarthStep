@@ -190,7 +190,8 @@ void screenMenuOnClick(byte id) {
 					renderSequenceLoader();
 				break;
 				case 3:
-					synths[UIView]->saveSequence();
+					synths[UIView]->midiToggle();
+					//synths[UIView]->saveSequence();
 					
 					//synths[UIView]->chainSawToggle();
 					//synths[UIView]->gainModToggle();
@@ -290,36 +291,6 @@ void menuOnClick(byte id) {
 			setUIView(UIViewLicense);
 	}
 }
-
-/*void synthConfigOnClick(byte id) {
-	byte v;
-	String s;
-	Synth * synth = synths[UIView == UIViewSynth1Config ? 0 : 1];
-	switch(id) {
-		case 4:
-			s = "MidiOut: ";
-			s += synth->midiToggle() ? "On" : "Off";
-			((Menu *) UIViews[UIView])->setLabel(id, s);
-		break;
-		default:
-			v = synth->waves[id]->getShape() + 1;
-			if(!(synth->waveOn & (1 << id))) {
-				v = WaveShapeSquare;
-				synth->waveOn |= (1 << id);
-			}
-			s = "Wave ";
-			s += (id + 1);
-			s += ": ";
-			if(v > 3) {
-				synth->waveOn &= ~(1 << id);
-				s += "Off";
-			} else {
-				synth->waves[id]->setShape(v);
-				s += WaveShapeNames[v];
-			}
-			((Menu *) UIViews[UIView])->setLabel(id, s);
-	}
-}*/
 
 void onChange(byte pin, int read) {
 	switch(UIView) {
