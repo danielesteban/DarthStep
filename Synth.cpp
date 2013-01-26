@@ -205,6 +205,7 @@ void Synth::saveSequence() {
 	char p[path.length()];
 	path.toCharArray(p, path.length() + 1);
 	f = SD.open(p, FILE_WRITE);
+	if(!f) return;
 	for(byte x=0; x<numTempoSteps; x++) {
 		f.print(_sequencerSteps[x].note);
 		f.print(",");
