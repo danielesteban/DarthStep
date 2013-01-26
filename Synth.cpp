@@ -37,22 +37,12 @@ Synth::Synth(int sampleRate, Midi midi, byte midiChannel) : UI() {
  		waves[x] = new Wave(WaveShapeSquare, sampleRate);
  	}
  	selectedNote = note;
- 	_chainSaw = 0;
- 	_chainSawEnabled = 0;
- 	_chainSawInterval = 0;
- 	_chainSawLastLoop = 0;
- 	_midiEnabled = 0;
- 	_hold = 0;
- 	//_holding = 0;
- 	_gainModEnabled = 0;
- 	_selectedOctave = 1;
-	_selectedScale = 1;
-	_selectedRoot = 0;
+ 	_chainSaw = _chainSawEnabled = _chainSawInterval = _chainSawLastLoop = _midiEnabled = _hold = _gainModEnabled = _selectedRoot = _tempoStep = 0; //_holding = 0;
+ 	_selectedOctave = _selectedScale = 1;
 	_waveNoteOffset[0] = 0;
 	_waveNoteOffset[1] = 7;
 	_waveNoteOffset[2] = 12;
 	_waveNoteOffset[3] = 16;
-	_tempoStep = 0;
  	_midi = midi;
  	_midiChannel = midiChannel;
  	clearSequencer();

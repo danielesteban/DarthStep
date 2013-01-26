@@ -9,7 +9,7 @@ Sampler::Sampler(Midi midi, byte midiChannel) {
 	byte x;
 	_midi = midi;
 	_midiChannel = midiChannel;
-	selectedSample = _sampleOn = 0;
+	_midiEnabled = selectedSample = _sampleOn = 0;
 	for(x=0; x<numSamples; x++) {
 		sampleQuantization[x] = 8;
 		for(byte s=0; s<numTempoSteps; s++) _sequencerSteps[x][s] = 0;
