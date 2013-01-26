@@ -29,7 +29,7 @@ void SynthConfig::renderAxis(byte axis) {
 
     _tft.setBackColor(0, 0, 0);
     _tft.setColor(255, 255, 255);
-    _tft.print(axis == 0 ? "Y" : "X", 10, y + 10);
+    _tft.print(axis == 0 ? "X" : "Y", 10, y + 10);
     renderButton(btid, "Pitch", x, y, bw, _synth->axis[axis] == 0);
     renderButton(btid + 1, "Gain", x + bw, y, bw, _synth->axis[axis] == 1);
     renderButton(btid + 2, "ChainSaw", x + bw + bw, y, bw, _synth->axis[axis] == 2);

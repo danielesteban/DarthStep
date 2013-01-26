@@ -139,12 +139,10 @@ void setup() {
 
 	sei(); //allow interrupts
 
-	//setUIView(UIView);
+	setUIView(UIView);
 
 	//debug
 	//Serial.begin(115200);
-	UIView = UIViewSynth1;
-	renderSynthConfig();
 }
 
 void loop(void) {
