@@ -6,6 +6,7 @@
 #include "SynthConfig.h"
 
 SynthConfig::SynthConfig(Synth * synth) : UI() {
+    availableOrientations[PORTRAIT] = 0;
     _synth = synth;
     byte x;
     for(x=0; x<6+(_synth->numWaves*5); x++) addButton(NULL);
@@ -126,7 +127,7 @@ void SynthConfig::onClick(byte id) {
             _synth->axis[oposite] = _synth->axis[axis];
             renderAxis(oposite);
         }
-        _synth->axis[axis] = id;
+        _synth->axis[axis] = _synth->axis[axis] == id ? 255 : id;
         renderAxis(axis);
     } else { //waves
         id -= 6;
