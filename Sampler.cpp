@@ -10,6 +10,8 @@ Sampler::Sampler(Midi midi, byte midiChannel) {
 	_midi = midi;
 	_midiChannel = midiChannel;
 	_midiEnabled = selectedSample = _sampleOn = 0;
+	gain = (1 << _sampleBits);
+	mute = 0;
 	for(x=0; x<numSamples; x++) {
 		sampleQuantization[x] = 8;
 		for(byte s=0; s<numTempoSteps; s++) _sequencerSteps[x][s] = 0;
@@ -70,6 +72,8 @@ void Sampler::update() {
 }
 
 int Sampler::output() {
+	if(mute) return 0;
+	
 	int output = 0;
 	for(byte x=0; x<numSamples; x++) {
 		if(!(_sampleOn & (1 << x))) continue;
@@ -84,8 +88,7 @@ int Sampler::output() {
 		}
 	}
 
-	return output;
-	//return ((long) output * (long) gain) >> _sampleBits;
+	return ((long) output * (long) gain) >> _sampleBits;
 }
 
 void Sampler::sequencerTick(byte tempoStep) {

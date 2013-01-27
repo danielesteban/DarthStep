@@ -29,6 +29,8 @@ class Sampler : public UI {
         void midiToggle();
         byte selectedSample,
             sampleQuantization[numSamples];
+        unsigned int gain;
+        bool mute;
     private:
         UTFT _tft;
 		Midi _midi;

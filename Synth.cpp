@@ -31,13 +31,13 @@ Synth::Synth(int sampleRate, Midi midi, byte midiChannel) : UI() {
 	note = 255;
 	waveOn = 1;
 	_output = 0;
-	gain = (1 << _sampleBits) / 8;
+	gain = (1 << _sampleBits) / 4;
 	for(x=0; x<numWaves; x++) {
 		waveGain[x] = 1 << _sampleBits;
  		waves[x] = new Wave(WaveShapeSquare, sampleRate);
  	}
  	selectedNote = note;
- 	axis[0] = _chainSaw = _chainSawLastLoop = _midiEnabled = _selectedRoot = _tempoStep = _touching = 0;
+ 	axis[0] = _chainSaw = _chainSawLastLoop = _midiEnabled = _selectedRoot = _tempoStep = _touching = mute = 0;
  	axis[1] = _selectedOctave = _selectedScale = 1;
  	_chainSawInterval = 255;
 	_waveNoteOffset[0] = 0;
@@ -104,7 +104,7 @@ void Synth::setOctave(byte id) {
 }
 
 int Synth::output() {
-	if(!_chainSaw && note != 255) {
+	if(!mute && !_chainSaw && note != 255) {
 		_output = 0;
 		for(byte i=0; i<numWaves; i++) {
 			if(!(waveOn & (1 << i))) continue;

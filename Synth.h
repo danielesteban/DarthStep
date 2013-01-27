@@ -54,6 +54,8 @@ class Synth : public UI {
         unsigned int gain,
             waveGain[numWaves];
 
+        bool mute;
+
         Wave * waves[numWaves];
     private:
         UTFT _tft;

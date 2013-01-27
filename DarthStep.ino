@@ -10,6 +10,7 @@
 #include "Synth.h"
 #include "SynthConfig.h"
 #include "Sampler.h"
+#include "Mixer.h"
 #include "Sequencer.h"
 #include "Samples.h"
 #include "License.h"
@@ -25,9 +26,10 @@ const byte numSynths = 2,
 	UIViewSynth2 = 1,
 	UIViewSampler = 2,
 	UIViewMenu = 3,
-	UIViewSynthConfig = 4,
-	UIViewSequenceLoader = 5,
-	UIViewLicense = 6;
+	UIViewMixer = 4,
+	UIViewSynthConfig = 5,
+	UIViewSequenceLoader = 6,
+	UIViewLicense = 7;
 
 const unsigned int sampleRate = 8000;
 
@@ -62,14 +64,15 @@ UTFT tft(ITDB32S, 38, 39, 40, 41);
 UTouch touch(42, 43, 44, 45, 46);
 
 //UIViews
-const byte numMenuItems = 4;
-String menuItems[numMenuItems] = {"Sampler -->", "Synth 1 -->", "Synth 2 -->", "License -->"};
+const byte numMenuItems = 5;
+String menuItems[numMenuItems] = {"Sampler -->", "Synth 1 -->", "Synth 2 -->", "Mixer -->", "License -->"};
 
 UI * UIViews[] = {
 	(UI *) synths[0], //UIViewSynth1
 	(UI *) synths[1], //UIViewSynth2
 	(UI *) sampler, //UIViewSampler
 	new Menu("Menu", numMenuItems, menuItems, menuOnClick), //UIViewMenu
+	NULL, //UIViewMixer
 	NULL, //UIViewSynthConfig
 	NULL, //UIViewSequenceLoader
 	NULL //UIViewLicense
@@ -146,6 +149,9 @@ void setup() {
 
 	//debug
 	//Serial.begin(115200);
+
+	//UIViews[UIViewMixer] = new Mixer(numSynths, synths, sampler);
+	//setUIView(UIViewMixer);
 }
 
 void loop(void) {
@@ -295,6 +301,10 @@ void menuOnClick(byte id) {
 			setUIView(UIViewSynth2);
 		break;
 		case 3:
+			UIViews[UIViewMixer] == NULL && (UIViews[UIViewMixer] = new Mixer(numSynths, synths, sampler));
+			setUIView(UIViewMixer);
+		break;
+		case 4:
 			UIViews[UIViewLicense] == NULL && (UIViews[UIViewLicense] = new License());
 			setUIView(UIViewLicense);
 	}
