@@ -55,19 +55,19 @@ void Intro::render(UTFT tft) {
 void Intro::update() {
 	unsigned long t = millis();
 	if(_index == 14) {
-		if(t - _lastFrame < 6000) return;
+		if(t - _lastFrame < 5000) return;
 		_index = 0;
 		yoffset = xoffset = 10;
-		_lastFrame = t;
 	}
 
 	char buffer[64];
 	strcpy_P(buffer, (char *) pgm_read_word(&(introTexts[_index])));
-	_tft.setColor(random(0, 256), random(0, 256), random(0, 256));
+	_tft.setColor(random(65, 256), random(65, 256), random(65, 256));
 	_index == 6 && (xoffset += 30) && (yoffset += 15);
 	_tft.print(buffer, xoffset, (_index * 15) + yoffset);
 	for(byte y=0; y<5; y++) _tft.drawPixel(random(0, _tft.getDisplayXSize()), random(0, _tft.getDisplayYSize()));
 	_index++;
+	_lastFrame = t;
 }
 
 void Intro::onTouch(byte orientation, int x, int y) {
