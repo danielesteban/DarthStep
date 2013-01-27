@@ -22,12 +22,12 @@ const unsigned int sampleRate = 8000;
 
 #define audioInterrupt (TIMER2_COMPA_vect)
 #define sequencerInterrupt (TIMER3_COMPA_vect)
-#define inputsInterrupt (TIMER4_COMPA_vect)
 #define audioOutput (PORTF)
 
 //Lib
 #if defined(pot1Pin) || defined(pot2Pin) || defined(photoResistorPin)
 	#include <AnalogInputs.h>
+	#define inputsInterrupt (TIMER4_COMPA_vect)
 #endif
 #include <Midi.h>
 #include <Wave.h>
@@ -131,7 +131,7 @@ void setup() {
 	touch.setPrecision(PREC_HI);
 
 	midi.begin();
-	
+
 	SD.begin();
 	
 	//set PORTF to all outputs- these bits will be used to send audio data to the R2R DAC
@@ -153,12 +153,14 @@ void setup() {
 	OCR3A = (F_CPU / sequencer.rate) - 1;
 	TIMSK3 |= (1 << OCIE3A);
 
-	TCCR4A = 0;
-	TCCR4B = 0;
-	TCCR4B |= (1 << WGM42);
-	TCCR4B |= (1 << CS40); //no prescaler
-	OCR4A = (F_CPU / (sequencer.rate / 2)) - 1;
-	TIMSK4 |= (1 << OCIE4A);
+	#ifdef AnalogInputs_h
+		TCCR4A = 0;
+		TCCR4B = 0;
+		TCCR4B |= (1 << WGM42);
+		TCCR4B |= (1 << CS40); //no prescaler
+		OCR4A = (F_CPU / (sequencer.rate / 2)) - 1;
+		TIMSK4 |= (1 << OCIE4A);
+	#endif
 
 	sei(); //allow interrupts
 
@@ -384,15 +386,15 @@ void onChange(byte pin, int read) {
 	}
 }
 
-ISR(inputsInterrupt) {
-	#ifdef AnalogInputs_h
+#ifdef AnalogInputs_h
+	ISR(inputsInterruptas) {
 		analogInputs.read();
-	#endif
-	for(byte x=0; x<numSynths; x++) synths[x]->chainSawTick();
-}
+	}
+#endif
 
 ISR(sequencerInterrupt) {
 	sequencer.tick();
+	for(byte x=0; x<numSynths; x++) synths[x]->chainSawTick();
 }
 
 ISR(audioInterrupt) {
