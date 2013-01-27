@@ -32,6 +32,8 @@ This started (an continues) as a learning process... but it turned out to be a p
 - Multiple quantization presets.
 - Midi Out
 
+It also has a 3 channel mixer UI with a gain slider and a mute button per channel.
+
 Everything runs all together on an arduino mega with a 9V battery and is controlled via a graphical touch interface (in a 320x240 TFT) and a few inputs.
 
 Both the synth and the sampler allow to record/save/load sequences into an SD Card.
