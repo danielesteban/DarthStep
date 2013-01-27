@@ -364,7 +364,7 @@ void onChange(byte pin, int read) {
 				#endif
 				#ifdef pot2Pin
 					case pot2Pin:
-					sampler->selectedSample = map(read, 1023, 0, 0, numSamples - 1);
+						sampler->selectedSample = map(read, 1023, 0, 0, numSamples - 1);
 				#endif
 			}
 		break;
