@@ -65,6 +65,7 @@ void Intro::update() {
 	_tft.setColor(random(65, 256), random(65, 256), random(65, 256));
 	_index == 6 && (xoffset += 30) && (yoffset += 15);
 	_tft.print(buffer, xoffset, (_index * 15) + yoffset);
+	_tft.setColor(random(0, 256), random(0, 256), random(0, 256));
 	for(byte y=0; y<5; y++) _tft.drawPixel(random(0, _tft.getDisplayXSize()), random(0, _tft.getDisplayYSize()));
 	_index++;
 	_index == 14 && (_lastFrame = t);
