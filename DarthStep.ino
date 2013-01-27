@@ -1,28 +1,13 @@
-//Lib
-#include <AnalogInputs.h>
-#include <Midi.h>
-#include <Wave.h>
-#include <UTFT.h>
-#include <UTouch.h>
-#include <SD.h>
-#include <Directory.h>
-#include <Menu.h>
-#include "Synth.h"
-#include "SynthConfig.h"
-#include "Sampler.h"
-#include "Mixer.h"
-#include "Sequencer.h"
-#include "Samples.h"
-#include "Intro.h"
-#include "License.h"
+//Comment this defines out if you don't want that functionality (or don't have the hardware conected)
+#define pot1Pin (A8) 
+#define pot2Pin (A9)
+#define photoResistorPin (A10)
 
 //Constants
-const byte numSynths = 2,
-	samplerMidiChannel = 1,
-	synthsMidiChannels[numSynths] = {2, 3},
-	pot1Pin = A8,
-	pot2Pin = A9,
-	photoResistorPin = A10,
+const byte numSynths = 2, //changing this one will require some code changes (besides i don't think it will handle more than that).
+	samplerMidiChannel = 1, //set this to wharever channel you want. 0 is all channels.
+	synthsMidiChannels[numSynths] = {2, 3}, //same here.
+	/* STOP EDITING HERE... if you don't know what you doin', of course ;{PP */
 	UIViewSynth1 = 0,
 	UIViewSynth2 = 1,
 	UIViewSampler = 2,
@@ -40,6 +25,26 @@ const unsigned int sampleRate = 8000;
 #define inputsInterrupt (TIMER4_COMPA_vect)
 #define audioOutput (PORTF)
 
+//Lib
+#if defined(pot1Pin) || defined(pot2Pin) || defined(photoResistorPin)
+	#include <AnalogInputs.h>
+#endif
+#include <Midi.h>
+#include <Wave.h>
+#include <UTFT.h>
+#include <UTouch.h>
+#include <SD.h>
+#include <Directory.h>
+#include <Menu.h>
+#include "Synth.h"
+#include "SynthConfig.h"
+#include "Sampler.h"
+#include "Mixer.h"
+#include "Sequencer.h"
+#include "Samples.h"
+#include "Intro.h"
+#include "License.h"
+
 //Vars
 byte orientation = LANDSCAPE,
 	UIView = UIViewIntro,
@@ -53,7 +58,9 @@ unsigned int photoResistorMax = 0,
 
 unsigned long photoResistorCalibrateStart = 0;
 
-AnalogInputs analogInputs(onChange);
+#ifdef AnalogInputs_h
+	AnalogInputs analogInputs(onChange);
+#endif
 Midi midi(Serial1);
 Synth * synths[numSynths] = {
 	new Synth(sampleRate, midi, synthsMidiChannels[0]),
@@ -110,15 +117,21 @@ void setup() {
 	tft.InitLCD(orientation);
 	setUIView(UIView);
 
-	analogInputs.setup(pot1Pin);
-	analogInputs.setup(pot2Pin);
-	analogInputs.setup(photoResistorPin);
+	#ifdef pot1Pin
+		analogInputs.setup(pot1Pin);
+	#endif
+	#ifdef pot2Pin
+		analogInputs.setup(pot2Pin);
+	#endif
+	#ifdef photoResistorPin
+		analogInputs.setup(photoResistorPin);
+	#endif
 
 	touch.InitTouch(orientation);
 	touch.setPrecision(PREC_HI);
 
 	midi.begin();
-
+	
 	SD.begin();
 	
 	//set PORTF to all outputs- these bits will be used to send audio data to the R2R DAC
@@ -162,7 +175,8 @@ void loop(void) {
 		UIViews[UIView]->readTouch(tft, touch, orientation, screenMenuOnClick);
 	}
 	
-	if(photoResistorEnabled && photoResistorCalibrate) {
+	#ifdef photoResistorPin
+		if(!photoResistorEnabled || !photoResistorCalibrate) return;
 		if(photoResistorCalibrateStart == 0) {
 			photoResistorCalibrateStart = millis();
 			photoResistorMax = 0;
@@ -172,7 +186,7 @@ void loop(void) {
 		photoResistorMax < read && (photoResistorMax = read);
 		photoResistorMin > read && (photoResistorMin = read);
 		photoResistorCalibrateStart <= millis() - 1000 && (photoResistorCalibrateStart = photoResistorCalibrate = 0);
-	}
+	#endif
 }
 
 void screenMenuOnClick(byte id) {
@@ -322,33 +336,45 @@ void onChange(byte pin, int read) {
 		case UIViewSynth1:
 		case UIViewSynth2:
 			switch(pin) {
-				case pot1Pin:
-					synths[UIView]->setScale(map(read, 0, 1023, 0, synths[UIView]->numScales - 1));
-				break;
-				case pot2Pin:
-					synths[UIView]->setOctave(map(read, 1023, 0, 0, synths[UIView]->numOctaves - 2));
-				break;
-				case photoResistorPin:
-					if(!photoResistorEnabled || photoResistorCalibrate) return;
-					read = constrain(map(constrain(read, photoResistorMin, photoResistorMax), photoResistorMin, photoResistorMax, synths[UIView]->selectedNote, synths[UIView]->selectedNote + (synths[UIView]->numNotes * 2)), 0, (synths[UIView]->numNotes * synths[UIView]->numOctaves) - 1);
-					if(synths[UIView]->note == read) return;
-					synths[UIView]->setNote(read);
+				#ifdef pot1Pin
+					case pot1Pin:
+						synths[UIView]->setScale(map(read, 0, 1023, 0, synths[UIView]->numScales - 1));
+					break;
+				#endif
+				#ifdef pot2Pin
+					case pot2Pin:
+						synths[UIView]->setOctave(map(read, 1023, 0, 0, synths[UIView]->numOctaves - 2));
+					break;
+				#endif
+				#ifdef photoResistorPin
+					case photoResistorPin:
+						if(!photoResistorEnabled || photoResistorCalibrate) return;
+						read = constrain(map(constrain(read, photoResistorMin, photoResistorMax), photoResistorMin, photoResistorMax, synths[UIView]->selectedNote, synths[UIView]->selectedNote + (synths[UIView]->numNotes * 2)), 0, (synths[UIView]->numNotes * synths[UIView]->numOctaves) - 1);
+						if(synths[UIView]->note == read) return;
+						synths[UIView]->setNote(read);
+				#endif
 			}
 		break;
 		case UIViewSampler:
 			switch(pin) {
-				case pot1Pin:
-					sampler->sampleQuantization[sampler->selectedSample] = pow(2, map(read, 0, 1023, 2, 5)) + 1;
-				break;
-				case pot2Pin:
+				#ifdef pot1Pin
+					case pot1Pin:
+						sampler->sampleQuantization[sampler->selectedSample] = pow(2, map(read, 0, 1023, 2, 5)) + 1;
+					break;
+				#endif
+				#ifdef pot2Pin
+					case pot2Pin:
 					sampler->selectedSample = map(read, 1023, 0, 0, numSamples - 1);
+				#endif
 			}
 		break;
 		case UIViewMenu:
 			switch(pin) {
-				case pot2Pin:
-					sequencer.setTempo(map(read, 1023, 0, 60, 300));
-				break;
+				#ifdef pot2Pin
+					case pot2Pin:
+						sequencer.setTempo(map(read, 1023, 0, 60, 300));
+					break;
+				#endif
 				default:
 					//Serial.print(pin, DEC);
 					//Serial.print(": ");
@@ -359,7 +385,9 @@ void onChange(byte pin, int read) {
 }
 
 ISR(inputsInterrupt) {
-	analogInputs.read();
+	#ifdef AnalogInputs_h
+		analogInputs.read();
+	#endif
 	for(byte x=0; x<numSynths; x++) synths[x]->chainSawTick();
 }
 
