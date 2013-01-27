@@ -34,11 +34,11 @@ void Mixer::render(UTFT tft) {
 void Mixer::update() {
 	unsigned long t = millis();
 	if(t - _lastFrame < 50) return; //20 frames per second;
-	_lastFrame = t;
 	for(byte id=0;id<3; id++) {
 		int gain = id == 0 ? _sampler->gain : _synths[id - 1]->gain;
 		if(renderedGains[id] != gain) renderSlider(id, gain);
 	}
+	_lastFrame = t;
 }
 
 void Mixer::renderSlider(byte id, int gain) {
