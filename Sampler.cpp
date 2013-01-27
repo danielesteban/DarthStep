@@ -31,12 +31,12 @@ void Sampler::update() {
 
 	if(selectedSample != _renderedSample || sampleQuantization[selectedSample] != _renderedQuantization) {
 		if(selectedSample != _renderedSample) {
+			_renderedSample = selectedSample;
 			_tft.setColor(255, 255, 255);
 			_tft.fillRect(0, 0, _tft.getDisplayXSize() - 1, 16);
 			_tft.setBackColor(255, 255, 255);
 			_tft.setColor(0, 0, 0);
 			_tft.print(sampleNames[selectedSample], 0, 0);
-			_renderedSample = selectedSample;
 		}
 
 		_renderedTempoStep = _renderedQuantization = sampleQuantization[selectedSample];

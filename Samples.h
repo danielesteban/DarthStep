@@ -11,6 +11,6 @@ const byte numSamples = 9,
 
 const String sampleNames[numSamples] = {"BASSDRUM", "SNARE", "STICK", "HI-HAT CLOSED", "HI-HAT OPEN", "HIGH TOM", "FLOOR TOM", "RAID", "CRASH"};
 
-extern const char * samples[numSamples];
+extern PROGMEM const char * samples[numSamples];
 
 #endif

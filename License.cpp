@@ -21,7 +21,7 @@ prog_char licenseText13[] PROGMEM = "FITNESS FOR A PARTICULAR PURPOSE. See";
 prog_char licenseText14[] PROGMEM = "the GNU General Public License for";
 prog_char licenseText15[] PROGMEM = "more details.";
 
-PROGMEM const char *licenseTexts[] = {
+PROGMEM const char * licenseTexts[] = {
 	licenseText1,
 	licenseText2,
 	licenseText3,

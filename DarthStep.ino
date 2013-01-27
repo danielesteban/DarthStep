@@ -13,6 +13,7 @@
 #include "Mixer.h"
 #include "Sequencer.h"
 #include "Samples.h"
+#include "Intro.h"
 #include "License.h"
 
 //Constants
@@ -26,10 +27,11 @@ const byte numSynths = 2,
 	UIViewSynth2 = 1,
 	UIViewSampler = 2,
 	UIViewMenu = 3,
-	UIViewMixer = 4,
-	UIViewSynthConfig = 5,
-	UIViewSequenceLoader = 6,
-	UIViewLicense = 7;
+	UIViewIntro = 4,
+	UIViewMixer = 5,
+	UIViewSynthConfig = 6,
+	UIViewSequenceLoader = 7,
+	UIViewLicense = 8;
 
 const unsigned int sampleRate = 8000;
 
@@ -40,7 +42,7 @@ const unsigned int sampleRate = 8000;
 
 //Vars
 byte orientation = LANDSCAPE,
-	UIView = UIViewMenu,
+	UIView = UIViewIntro,
 	sequenceLoaderSynth;
 
 bool photoResistorEnabled = 0,
@@ -71,7 +73,8 @@ UI * UIViews[] = {
 	(UI *) synths[0], //UIViewSynth1
 	(UI *) synths[1], //UIViewSynth2
 	(UI *) sampler, //UIViewSampler
-	new Menu("Menu", numMenuItems, menuItems, menuOnClick), //UIViewMenu
+	new Menu("DarthStep", numMenuItems, menuItems, menuOnClick), //UIViewMenu
+	(UI *) new Intro(introOnTouch), //UIViewIntro
 	NULL, //UIViewMixer
 	NULL, //UIViewSynthConfig
 	NULL, //UIViewSequenceLoader
@@ -101,19 +104,20 @@ void setUIView(byte view) {
 //main funcs
 void setup() {
 	byte x;
+	
 	randomSeed(analogRead(A13));
+
+	tft.InitLCD(orientation);
+	setUIView(UIView);
 
 	analogInputs.setup(pot1Pin);
 	analogInputs.setup(pot2Pin);
 	analogInputs.setup(photoResistorPin);
 
-	midi.begin();
-
-	tft.InitLCD(orientation);
-	tft.clrScr();
-
 	touch.InitTouch(orientation);
 	touch.setPrecision(PREC_HI);
+
+	midi.begin();
 
 	SD.begin();
 	
@@ -145,8 +149,6 @@ void setup() {
 
 	sei(); //allow interrupts
 
-	setUIView(UIView);
-
 	//debug
 	//Serial.begin(115200);
 
@@ -174,6 +176,7 @@ void loop(void) {
 }
 
 void screenMenuOnClick(byte id) {
+	if(UIView == UIViewIntro) return;
 	if(id == 0) {
 		if(UIView == UIViewMenu) return;
 		return setUIView(UIViewMenu);
@@ -308,6 +311,10 @@ void menuOnClick(byte id) {
 			UIViews[UIViewLicense] == NULL && (UIViews[UIViewLicense] = new License());
 			setUIView(UIViewLicense);
 	}
+}
+
+void introOnTouch(byte id) {
+	setUIView(UIViewMenu);
 }
 
 void onChange(byte pin, int read) {
