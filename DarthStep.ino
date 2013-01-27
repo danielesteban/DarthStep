@@ -110,8 +110,6 @@ void setUIView(byte view) {
 
 //main funcs
 void setup() {
-	byte x;
-	
 	randomSeed(analogRead(A13));
 
 	tft.InitLCD(orientation);
@@ -184,7 +182,7 @@ void loop(void) {
 			photoResistorMax = 0;
 			photoResistorMin = 1023;
 		}
-		int read = analogInputs.get(photoResistorPin)->read;
+		const unsigned int read = analogInputs.get(photoResistorPin)->read;
 		photoResistorMax < read && (photoResistorMax = read);
 		photoResistorMin > read && (photoResistorMin = read);
 		photoResistorCalibrateStart <= millis() - 1000 && (photoResistorCalibrateStart = photoResistorCalibrate = 0);
@@ -387,7 +385,7 @@ void onChange(byte pin, int read) {
 }
 
 #ifdef AnalogInputs_h
-	ISR(inputsInterruptas) {
+	ISR(inputsInterrupt) {
 		analogInputs.read();
 	}
 #endif
