@@ -44,7 +44,7 @@ void Mixer::update() {
 void Mixer::renderSlider(byte id, int gain) {
 	int w = (_tft.getDisplayXSize() - 11) / 3,
 		x = 10 + (w * id),
-		y = 22 + ((long) (256 - gain) * (_tft.getDisplayYSize() - 60 - 22) / 256);
+		y = 22 + ((long) (256 - gain) * (_tft.getDisplayYSize() - 50 - 22) / 256);
 
 	_tft.setColor(65, 65, 65);
     _tft.fillRect(x, 22, x + w - 10, y);
@@ -56,15 +56,15 @@ void Mixer::renderSlider(byte id, int gain) {
 void Mixer::renderMute(byte id) {
 	int w = (_tft.getDisplayXSize() - 11) / 3,
 		x = 10 + (w * id),
-		y = _tft.getDisplayYSize() - 50;
+		y = _tft.getDisplayYSize() - 40;
 
 	renderButton(id, (char *) (id == 0 ? "Sampler" : id == 1 ? "Synth 1" : "Synth 2"), x, y, w, !(id == 0 ? _sampler->mute : _synths[id - 1]->mute));
 }
 
 void Mixer::onTouch(byte orientation, int x, int y) {
-	if(y < 12 || y > (_tft.getDisplayYSize() - 50) || x < 10 || x > _tft.getDisplayXSize() - 11) return;
+	if(y < 12 || y > (_tft.getDisplayYSize() - 40) || x < 10 || x > _tft.getDisplayXSize() - 11) return;
 	
-	unsigned int h = (_tft.getDisplayYSize() - 60 - 22);
+	unsigned int h = (_tft.getDisplayYSize() - 50 - 22);
 
 	y -= 22;
 	y < 0 && (y = 0);
