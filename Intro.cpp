@@ -67,7 +67,7 @@ void Intro::update() {
 	_tft.print(buffer, xoffset, (_index * 15) + yoffset);
 	for(byte y=0; y<5; y++) _tft.drawPixel(random(0, _tft.getDisplayXSize()), random(0, _tft.getDisplayYSize()));
 	_index++;
-	_lastFrame = t;
+	_index == 14 && (_lastFrame = t);
 }
 
 void Intro::onTouch(byte orientation, int x, int y) {
