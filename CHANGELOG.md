@@ -8,7 +8,7 @@
 
 ## v2.1 (Jan 26, 2013)
 
-  - SynthConfig Dialog really improved.. also added the "truly 2D" :PP wich means now you can decide wich axis modifies wich synth property.
+  - SynthConfig Dialog really improved.. also added the "truly 2D" :PP which means now you can decide which axis modifies which synth property.
   - MidiOut added to both sampler & synth.
   - Optimized Wave library & Samples.
   - A bunch of bugfixes and improvements.
@@ -18,7 +18,8 @@
   - The very first of the TFT Touch versions... Already had:
     - The sampler
     - The synths.
-    - The sequencer. 
+    - The sequencer.
+  
   - I Also added the GNU GPL.
 
 ## v1.0 (Dec 29, 2012)
