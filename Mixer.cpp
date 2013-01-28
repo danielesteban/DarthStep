@@ -49,7 +49,7 @@ void Mixer::renderSlider(byte id, int gain) {
 	_tft.setColor(65, 65, 65);
     _tft.fillRect(x, 22, x + w - 10, y);
     _tft.setColor(225, 65, 65);
-    _tft.fillRect(x, y, x + w - 10, _tft.getDisplayYSize() - 60);
+    _tft.fillRect(x, y, x + w - 10, _tft.getDisplayYSize() - 50);
     renderedGains[id] = gain;
 }
 

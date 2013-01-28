@@ -54,7 +54,8 @@ byte orientation = LANDSCAPE,
 	sequenceLoaderSynth;
 
 bool photoResistorEnabled = 0,
-	photoResistorCalibrate = 0;
+	photoResistorCalibrate = 0,
+	autoOrientation = 1;
 
 unsigned int photoResistorMax = 0,
 	photoResistorMin = 1023;
@@ -211,7 +212,7 @@ void screenMenuOnClick(byte id) {
 		case UIViewMenu:
 			switch(id) {
 				case 4:
-					setOrientation(orientation == LANDSCAPE ? PORTRAIT : LANDSCAPE);
+					autoOrientation = !autoOrientation; //Experimental!
 			}
 		break;
 		case UIViewSynth1:
@@ -357,7 +358,8 @@ void introOnTouch(byte id) {
 					case accelerometerYPin:
 						//Serial.print("Y: ");
 						//Serial.println(read, DEC);
-						if(read > 540) {
+						if(!autoOrientation) return;
+						if(read > 580) {
 							if(orientation != LANDSCAPE) setOrientation(LANDSCAPE);
 						} else if(orientation != PORTRAIT) setOrientation(PORTRAIT);
 					break;
