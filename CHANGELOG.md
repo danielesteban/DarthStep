@@ -1,3 +1,11 @@
+## v2.3 (Feb ??, 2013)
+  
+  - Accelerometer Basic hardware support
+  - Alpha version of autoOrientation
+  - Sample toggle/clear
+  - Added MakeFile
+  - Some bugfixes and improvements.
+
 ## v2.2 (Jan 28, 2013)
 
   - Mixer UI with sliders & mute buttons for each channel.
