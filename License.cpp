@@ -5,7 +5,7 @@
 
 #include "License.h"
 
-prog_char licenseText1[] PROGMEM = "DarthStep | (C) 2013 Daniel Esteban";
+prog_char licenseText1[] PROGMEM = "DarthStep | (C) 2013 Daniel Esteban N.";
 prog_char licenseText2[] PROGMEM = "This program is free software: you can";
 prog_char licenseText3[] PROGMEM = "redistribute it and/or modify it under";
 prog_char licenseText4[] PROGMEM = "the terms of the GNU General Public";
@@ -46,23 +46,28 @@ License::License() {
 void License::render(UTFT tft) {
 	tft.clrScr();
 	tft.setFont(SmallFont);
+	_tft = tft;
+	_index = _offset = 0;
+	update();
+}
+
+void License::update() {
+	if(_index == 15) return;
 
 	char buffer[64];
-	byte offset = 0;
-	for(byte x=0; x<15; x++) {
-		strcpy_P(buffer, (char *) pgm_read_word(&(licenseTexts[x])));
-		if(x == 0) {
-			tft.setColor(255, 255, 255);
-			tft.fillRect(0, 0, tft.getDisplayXSize() - 1, 12);
-			tft.setBackColor(255, 255, 255);
-			tft.setColor(0, 0, 0);
-			tft.print(buffer, 10, 0);
+	strcpy_P(buffer, (char *) pgm_read_word(&(licenseTexts[_index])));
+	if(_index == 0) {
+		_tft.setColor(255, 255, 255);
+		_tft.fillRect(0, 0, _tft.getDisplayXSize() - 1, 12);
+		_tft.setBackColor(255, 255, 255);
+		_tft.setColor(0, 0, 0);
+		_tft.print(buffer, 10, 0);
 
-			tft.setBackColor(0, 0, 0);
-			tft.setColor(255, 255, 255);
-			continue;
-		}
-		x == 8 && (offset += 15);
-		tft.print(buffer, 10, (x * 15) + offset);
+		_tft.setBackColor(0, 0, 0);
+		_tft.setColor(255, 255, 255);
+	} else {
+		_index == 8 && (_offset += 15);
+		_tft.print(buffer, 10, (_index * 15) + _offset);
 	}
+	_index++;
 }

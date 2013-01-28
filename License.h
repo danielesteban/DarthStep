@@ -18,7 +18,11 @@ class License : public UI {
     public:
         License();
         void render(UTFT tft);
+        void update();
     private:
+    	UTFT _tft;
+    	byte _index,
+    		_offset;
         
 };
  
