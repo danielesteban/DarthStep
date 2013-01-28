@@ -349,16 +349,17 @@ void introOnTouch(byte id) {
 			switch(pin) {
 				#ifdef accelerometerXPin
 					case accelerometerXPin:
-						Serial.print("X: ");
-						Serial.println(read, DEC);
-						//if(read > x && orientation != LANDSCAPE) setOrientation(LANDSCAPE);
-						//if(read < x && orientation != PORTRAIT) setOrientation(PORTRAIT);
+						//Serial.print("X: ");
+						//Serial.println(read, DEC);
 					break;
 				#endif
 				#ifdef accelerometerYPin
 					case accelerometerYPin:
 						//Serial.print("Y: ");
 						//Serial.println(read, DEC);
+						if(read > 540) {
+							if(orientation != LANDSCAPE) setOrientation(LANDSCAPE);
+						} else if(orientation != PORTRAIT) setOrientation(PORTRAIT);
 					break;
 				#endif
 				#ifdef accelerometerZPin
@@ -411,13 +412,7 @@ void introOnTouch(byte id) {
 					#ifdef pot2Pin
 						case pot2Pin:
 							sequencer.setTempo(map(read, 1023, 0, 60, 300));
-						break;
 					#endif
-					default:
-						//Serial.print(pin, DEC);
-						//Serial.print(": ");
-						//Serial.println(read, DEC);
-					break;
 				}
 		}
 	}
