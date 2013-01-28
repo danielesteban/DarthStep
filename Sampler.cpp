@@ -109,6 +109,19 @@ void Sampler::midiToggle() {
 	_midiEnabled = !_midiEnabled;
 }
 
+void Sampler::toggleSteps() {
+	for(byte x=0; x<_renderedQuantization; x++) {
+		byte step = x * numTempoSteps / _renderedQuantization;
+		_sequencerSteps[selectedSample][step] = !_sequencerSteps[selectedSample][step];
+	}
+	_renderedQuantization = 255;
+}
+
+void Sampler::clearSample() {
+	for(byte x=0; x<numTempoSteps; x++) _sequencerSteps[selectedSample][x] = 0;
+	_renderedQuantization = 255;
+}
+
 void Sampler::renderStep(byte step, bool active) {
 	if(active) _tft.setColor(0, 0, 255);
 	else _tft.setColor(255, 255, 255);

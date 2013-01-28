@@ -250,6 +250,12 @@ void screenMenuOnClick(byte id) {
 		break;
 		case UIViewSampler:
 			switch(id) {
+				case 1:
+					sampler->toggleSteps();
+				break;
+				case 2:
+					sampler->clearSample();
+				break;
 				case 3:
 					sampler->midiToggle();
 			}
