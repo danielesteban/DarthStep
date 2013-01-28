@@ -28,7 +28,7 @@ const String noteNames[12] = {"C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "
 
 Synth::Synth(int sampleRate, Midi midi, byte midiChannel) : UI() {
 	byte x;
-	note = 255;
+	axis[1] = _chainSawInterval = note = 255;
 	waveOn = 1;
 	_output = 0;
 	gain = (1 << _sampleBits) / 4;
@@ -38,8 +38,7 @@ Synth::Synth(int sampleRate, Midi midi, byte midiChannel) : UI() {
  	}
  	selectedNote = note;
  	axis[0] = _chainSaw = _chainSawLastLoop = _midiEnabled = _selectedRoot = _tempoStep = _touching = mute = 0;
- 	axis[1] = _selectedOctave = _selectedScale = 1;
- 	_chainSawInterval = 255;
+ 	_selectedOctave = _selectedScale = 1;
 	_waveNoteOffset[0] = 0;
 	_waveNoteOffset[1] = 7;
 	_waveNoteOffset[2] = 12;
