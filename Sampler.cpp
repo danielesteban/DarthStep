@@ -6,16 +6,12 @@
 #include "Sampler.h"
 
 Sampler::Sampler(Midi midi, byte midiChannel) {
-	byte x;
 	_midi = midi;
 	_midiChannel = midiChannel;
 	_midiEnabled = selectedSample = _sampleOn = 0;
 	gain = (1 << _sampleBits);
 	mute = 0;
-	for(x=0; x<numSamples; x++) {
-		sampleQuantization[x] = 8;
-		for(byte s=0; s<numTempoSteps; s++) _sequencerSteps[x][s] = 0;
-	}
+	clearSampler();
 }
 
 void Sampler::render(UTFT tft) {
@@ -119,6 +115,14 @@ void Sampler::toggleSteps() {
 
 void Sampler::clearSample() {
 	for(byte x=0; x<numTempoSteps; x++) _sequencerSteps[selectedSample][x] = 0;
+	_renderedQuantization = 255;
+}
+
+void Sampler::clearSampler() {
+	for(byte x=0; x<numSamples; x++) {
+		sampleQuantization[x] = 8;
+		for(byte s=0; s<numTempoSteps; s++) _sequencerSteps[x][s] = 0;
+	}
 	_renderedQuantization = 255;
 }
 

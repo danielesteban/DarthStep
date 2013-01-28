@@ -29,6 +29,7 @@ class Sampler : public UI {
         void midiToggle();
         void toggleSteps();
         void clearSample();
+        void clearSampler();
         byte selectedSample,
             sampleQuantization[numSamples];
         unsigned int gain;

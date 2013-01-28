@@ -258,6 +258,9 @@ void screenMenuOnClick(byte id) {
 				break;
 				case 3:
 					sampler->midiToggle();
+				break;
+				case 4:
+					sampler->clearSampler();
 			}
 		break;
 		case UIViewSequenceLoader:
