@@ -19,9 +19,11 @@ class SynthConfig : public UI {
     public:
         SynthConfig(Synth * synth);
         void render(UTFT tft);
+        void toggleMode();
         Synth * _synth;
     private:
         UTFT _tft;
+        byte _mode;	
 
         void renderAxis(byte axis);
         void renderWave(byte wave);

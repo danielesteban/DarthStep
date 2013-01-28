@@ -28,7 +28,7 @@ const String noteNames[12] = {"C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "
 
 Synth::Synth(int sampleRate, Midi midi, byte midiChannel) : UI() {
 	byte x;
-	axis[1] = _chainSawInterval = note = 255;
+	axis[1] = axis[2] = axis[3] = axis[4] = _chainSawInterval = note = 255;
 	waveOn = 1;
 	_output = 0;
 	gain = (1 << _sampleBits) / 4;

@@ -182,8 +182,8 @@ void setup() {
 	//debug
 	Serial.begin(115200);
 
-	//UIViews[UIViewMixer] = new Mixer(numSynths, synths, sampler);
-	//setUIView(UIViewMixer);
+	//UIViews[UIViewSynthConfig] = new SynthConfig(synths[0]);
+	//setUIView(UIViewSynthConfig);
 }
 
 void screenMenuOnClick(byte id);
@@ -280,14 +280,14 @@ void screenMenuOnClick(byte id) {
 		case UIViewSynth2:
 			switch(id) {
 				case 1:
+					synths[UIView]->midiToggle();
+				break;
+				case 2:
 					if(synths[UIView]->sequencerStatus == 2) synths[UIView]->clearSequencer();
 					else synths[UIView]->sequencerStatus++;
 				break;
-				case 2:
-					renderSequenceLoader();
-				break;
 				case 3:
-					synths[UIView]->midiToggle();
+					renderSequenceLoader();
 					//synths[UIView]->saveSequence();
 					
 					//synths[UIView]->chainSawToggle();
@@ -303,6 +303,9 @@ void screenMenuOnClick(byte id) {
 		break;
 		case UIViewSynthConfig:
 			switch(id) {
+				case 3:
+					((SynthConfig *) UIViews[UIViewSynthConfig])->toggleMode();
+				break;
 				case 4:
 					setUIView(((SynthConfig *) UIViews[UIViewSynthConfig])->_synth == synths[0] ? UIViewSynth1 : UIViewSynth2); //Lame!
 					delete UIViews[UIViewSynthConfig];
@@ -312,13 +315,13 @@ void screenMenuOnClick(byte id) {
 		case UIViewSampler:
 			switch(id) {
 				case 1:
-					sampler->toggleSteps();
+					sampler->midiToggle();
 				break;
 				case 2:
-					sampler->clearSample();
+					sampler->toggleSteps();
 				break;
 				case 3:
-					sampler->midiToggle();
+					sampler->clearSample();
 				break;
 				case 4:
 					sampler->clearSampler();
@@ -365,8 +368,8 @@ void introOnTouch(byte id) {
 			switch(pin) {
 				#ifdef accelerometerXPin
 					case accelerometerXPin:
-						//Serial.print("X: ");
-						//Serial.println(read, DEC);
+						Serial.print("X: ");
+						Serial.println(read, DEC);
 					break;
 				#endif
 				#ifdef accelerometerYPin

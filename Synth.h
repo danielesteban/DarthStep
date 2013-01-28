@@ -49,7 +49,7 @@ class Synth : public UI {
             selectedNote,
             waveOn,
             sequencerStatus,
-            axis[2];
+            axis[5];
 
         unsigned int gain,
             waveGain[numWaves];
