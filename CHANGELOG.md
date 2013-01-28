@@ -19,7 +19,6 @@
     - The sampler
     - The synths.
     - The sequencer.
-  
   - I Also added the GNU GPL.
 
 ## v1.0 (Dec 29, 2012)
