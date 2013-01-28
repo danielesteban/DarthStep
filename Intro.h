@@ -24,8 +24,9 @@ class Intro : public UI {
         TouchEvent _onTouch;
 		unsigned long _lastFrame;
 		byte _index,
-			yoffset,
-			xoffset;
+			_yoffset,
+			_xoffset,
+            _count;
 
         void onTouch(byte orientation, int x, int y);
 };
