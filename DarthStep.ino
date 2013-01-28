@@ -63,6 +63,7 @@ unsigned int photoResistorMax = 0,
 unsigned long photoResistorCalibrateStart = 0;
 
 #ifdef AnalogInputs_h
+	void onChange(byte pin, int read);
 	AnalogInputs analogInputs(onChange);
 #endif
 Midi midi(Serial1);
@@ -79,6 +80,9 @@ UTouch touch(42, 43, 44, 45, 46);
 //UIViews
 const byte numMenuItems = 5;
 String menuItems[numMenuItems] = {"Sampler -->", "Synth 1 -->", "Synth 2 -->", "Mixer -->", "License -->"};
+
+void menuOnClick(byte id);
+void introOnTouch(byte id);
 
 UI * UIViews[] = {
 	(UI *) synths[0], //UIViewSynth1
@@ -182,6 +186,8 @@ void setup() {
 	//setUIView(UIViewMixer);
 }
 
+void screenMenuOnClick(byte id);
+
 void loop(void) {
 	if(UIViews[UIView]->rendered) {
 		UIViews[UIView]->update();
@@ -200,6 +206,61 @@ void loop(void) {
 		photoResistorMin > read && (photoResistorMin = read);
 		photoResistorCalibrateStart <= millis() - 1000 && (photoResistorCalibrateStart = photoResistorCalibrate = 0);
 	#endif
+}
+
+void sequenceLoaderOnClick(byte id) {
+	Directory * dir = new Directory("/SEQS");
+	file * f = dir->getFiles();
+
+	byte c = -1;
+
+	while(f != NULL) {
+		strcmp(f->name, "LAST") != 0 && c++;
+		if(c == id) break;
+		f = f->next;
+	}
+
+	synths[sequenceLoaderSynth]->loadSequence(f->name);
+	setUIView(sequenceLoaderSynth);
+
+	delete dir;
+}
+
+void renderSequenceLoader() {
+	Directory * dir = new Directory("/SEQS");
+	file * f = dir->getFiles();
+
+	byte count = 0,
+		c = 0;
+
+	while(f != NULL) { //this is really lame, but i'm kinda tired ;P
+		strcmp(f->name, "LAST") != 0 && count++;
+		f = f->next;
+	}
+	
+	String filenames[count];
+	
+	f = dir->getFiles();
+	while(f != NULL) {
+		if(strcmp(f->name, "LAST") != 0) {
+			filenames[c] = f->name;
+			c++;
+		}
+		f = f->next;
+	}
+
+	delete dir;
+
+	if(UIViews[UIViewSequenceLoader] != NULL) delete UIViews[UIViewSequenceLoader];
+	UIViews[UIViewSequenceLoader] = new Menu("Load sequence", count, filenames, sequenceLoaderOnClick);
+	sequenceLoaderSynth = UIView;
+	setUIView(UIViewSequenceLoader);
+}
+
+void renderSynthConfig() {
+	if(UIViews[UIViewSynthConfig] != NULL) delete UIViews[UIViewSynthConfig];
+	UIViews[UIViewSynthConfig] = new SynthConfig(synths[UIView]);
+	setUIView(UIViewSynthConfig);
 }
 
 void screenMenuOnClick(byte id) {
@@ -271,61 +332,6 @@ void screenMenuOnClick(byte id) {
 					UIViews[UIViewSequenceLoader] = NULL;
 			}
 	}
-}
-
-void renderSynthConfig() {
-	if(UIViews[UIViewSynthConfig] != NULL) delete UIViews[UIViewSynthConfig];
-	UIViews[UIViewSynthConfig] = new SynthConfig(synths[UIView]);
-	setUIView(UIViewSynthConfig);
-}
-
-void renderSequenceLoader() {
-	Directory * dir = new Directory("/SEQS");
-	file * f = dir->getFiles();
-
-	byte count = 0,
-		c = 0;
-
-	while(f != NULL) { //this is really lame, but i'm kinda tired ;P
-		strcmp(f->name, "LAST") != 0 && count++;
-		f = f->next;
-	}
-	
-	String filenames[count];
-	
-	f = dir->getFiles();
-	while(f != NULL) {
-		if(strcmp(f->name, "LAST") != 0) {
-			filenames[c] = f->name;
-			c++;
-		}
-		f = f->next;
-	}
-
-	delete dir;
-
-	if(UIViews[UIViewSequenceLoader] != NULL) delete UIViews[UIViewSequenceLoader];
-	UIViews[UIViewSequenceLoader] = new Menu("Load sequence", count, filenames, sequenceLoaderOnClick);
-	sequenceLoaderSynth = UIView;
-	setUIView(UIViewSequenceLoader);
-}
-
-void sequenceLoaderOnClick(byte id) {
-	Directory * dir = new Directory("/SEQS");
-	file * f = dir->getFiles();
-
-	byte c = -1;
-
-	while(f != NULL) {
-		strcmp(f->name, "LAST") != 0 && c++;
-		if(c == id) break;
-		f = f->next;
-	}
-
-	synths[sequenceLoaderSynth]->loadSequence(f->name);
-	setUIView(sequenceLoaderSynth);
-
-	delete dir;
 }
 
 void menuOnClick(byte id) {
