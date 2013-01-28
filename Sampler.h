@@ -28,7 +28,7 @@ class Sampler : public UI {
         void sequencerTick(byte tempoStep);
         void midiToggle();
         void toggleSteps();
-        void clearSteps();
+        void clearSample();
         byte selectedSample,
             sampleQuantization[numSamples];
         unsigned int gain;
