@@ -2,6 +2,9 @@
 #define pot1Pin (A8) 
 #define pot2Pin (A9)
 #define photoResistorPin (A10)
+#define accelerometerXPin (A11)
+#define accelerometerYPin (A13)
+#define accelerometerZPin (A14)
 
 //Constants
 const byte numSynths = 2, //changing this one will require some code changes (besides i don't think it will handle more than that).
@@ -25,7 +28,7 @@ const unsigned int sampleRate = 8000;
 #define audioOutput (PORTF)
 
 //Lib
-#if defined(pot1Pin) || defined(pot2Pin) || defined(photoResistorPin)
+#if defined(pot1Pin) || defined(pot2Pin) || defined(photoResistorPin) || defined(accelerometerXPin) || defined(accelerometerYPin) || defined(accelerometerZPin)
 	#include <AnalogInputs.h>
 	#define inputsInterrupt (TIMER4_COMPA_vect)
 #endif
@@ -88,8 +91,8 @@ UI * UIViews[] = {
 	NULL //UIViewLicense
 };
 
-void setOrientation(byte o, bool redraw = true) {
-	if(redraw && !UIViews[UIView]->availableOrientations[o]) return;
+void setOrientation(byte o, bool force = false, bool redraw = true) {
+	if(!force && redraw && (!UIViews[UIView]->availableOrientations[o] || !UIViews[UIView]->rendered)) return;
 	orientation = o;
 	tft.setOrientation(o);
 	touch.setOrientation(o);
@@ -103,7 +106,7 @@ void setOrientation(byte o, bool redraw = true) {
 void setUIView(byte view) {
 	UIViews[UIView]->rendered = false;
 	UIView = view;
-	if(!UIViews[UIView]->availableOrientations[orientation]) return setOrientation(orientation == LANDSCAPE ? PORTRAIT : LANDSCAPE);
+	if(!UIViews[UIView]->availableOrientations[orientation]) return setOrientation(orientation == LANDSCAPE ? PORTRAIT : LANDSCAPE, true);
 	UIViews[UIView]->render(tft);
 	UIViews[UIView]->rendered = true;
 }
@@ -123,6 +126,15 @@ void setup() {
 	#endif
 	#ifdef photoResistorPin
 		analogInputs.setup(photoResistorPin);
+	#endif
+	#ifdef accelerometerXPin
+		analogInputs.setup(accelerometerXPin);
+	#endif
+	#ifdef accelerometerYPin
+		analogInputs.setup(accelerometerYPin);
+	#endif
+	#ifdef accelerometerZPin
+		analogInputs.setup(accelerometerZPin);
 	#endif
 
 	touch.InitTouch(orientation);
@@ -163,7 +175,7 @@ void setup() {
 	sei(); //allow interrupts
 
 	//debug
-	//Serial.begin(115200);
+	Serial.begin(115200);
 
 	//UIViews[UIViewMixer] = new Mixer(numSynths, synths, sampler);
 	//setUIView(UIViewMixer);
@@ -331,58 +343,85 @@ void introOnTouch(byte id) {
 	setUIView(UIViewMenu);
 }
 
-void onChange(byte pin, int read) {
-	switch(UIView) {
-		case UIViewSynth1:
-		case UIViewSynth2:
+#ifdef AnalogInputs_h
+	void onChange(byte pin, int read) {
+		#if defined(accelerometerXPin) || defined(accelerometerYPin) || defined(accelerometerZPin)
 			switch(pin) {
-				#ifdef pot1Pin
-					case pot1Pin:
-						synths[UIView]->setScale(map(read, 0, 1023, 0, synths[UIView]->numScales - 1));
+				#ifdef accelerometerXPin
+					case accelerometerXPin:
+						Serial.print("X: ");
+						Serial.println(read, DEC);
+						//if(read > x && orientation != LANDSCAPE) setOrientation(LANDSCAPE);
+						//if(read < x && orientation != PORTRAIT) setOrientation(PORTRAIT);
 					break;
 				#endif
-				#ifdef pot2Pin
-					case pot2Pin:
-						synths[UIView]->setOctave(map(read, 1023, 0, 0, synths[UIView]->numOctaves - 2));
+				#ifdef accelerometerYPin
+					case accelerometerYPin:
+						//Serial.print("Y: ");
+						//Serial.println(read, DEC);
 					break;
 				#endif
-				#ifdef photoResistorPin
-					case photoResistorPin:
-						if(!photoResistorEnabled || photoResistorCalibrate) return;
-						read = constrain(map(constrain(read, photoResistorMin, photoResistorMax), photoResistorMin, photoResistorMax, synths[UIView]->selectedNote, synths[UIView]->selectedNote + (synths[UIView]->numNotes * 2)), 0, (synths[UIView]->numNotes * synths[UIView]->numOctaves) - 1);
-						if(synths[UIView]->note == read) return;
-						synths[UIView]->setNote(read);
+				#ifdef accelerometerZPin
+					case accelerometerZPin:
+						//Serial.print("Z: ");
+						//Serial.println(read, DEC);
+					break;
 				#endif
 			}
-		break;
-		case UIViewSampler:
-			switch(pin) {
-				#ifdef pot1Pin
-					case pot1Pin:
-						sampler->sampleQuantization[sampler->selectedSample] = pow(2, map(read, 0, 1023, 2, 5)) + 1;
+		#endif
+
+		switch(UIView) {
+			case UIViewSynth1:
+			case UIViewSynth2:
+				switch(pin) {
+					#ifdef pot1Pin
+						case pot1Pin:
+							synths[UIView]->setScale(map(read, 0, 1023, 0, synths[UIView]->numScales - 1));
+						break;
+					#endif
+					#ifdef pot2Pin
+						case pot2Pin:
+							synths[UIView]->setOctave(map(read, 1023, 0, 0, synths[UIView]->numOctaves - 2));
+						break;
+					#endif
+					#ifdef photoResistorPin
+						case photoResistorPin:
+							if(!photoResistorEnabled || photoResistorCalibrate) return;
+							read = constrain(map(constrain(read, photoResistorMin, photoResistorMax), photoResistorMin, photoResistorMax, synths[UIView]->selectedNote, synths[UIView]->selectedNote + (synths[UIView]->numNotes * 2)), 0, (synths[UIView]->numNotes * synths[UIView]->numOctaves) - 1);
+							if(synths[UIView]->note == read) return;
+							synths[UIView]->setNote(read);
+					#endif
+				}
+			break;
+			case UIViewSampler:
+				switch(pin) {
+					#ifdef pot1Pin
+						case pot1Pin:
+							sampler->sampleQuantization[sampler->selectedSample] = pow(2, map(read, 0, 1023, 2, 5)) + 1;
+						break;
+					#endif
+					#ifdef pot2Pin
+						case pot2Pin:
+							sampler->selectedSample = map(read, 1023, 0, 0, numSamples - 1);
+					#endif
+				}
+			break;
+			case UIViewMenu:
+				switch(pin) {
+					#ifdef pot2Pin
+						case pot2Pin:
+							sequencer.setTempo(map(read, 1023, 0, 60, 300));
+						break;
+					#endif
+					default:
+						//Serial.print(pin, DEC);
+						//Serial.print(": ");
+						//Serial.println(read, DEC);
 					break;
-				#endif
-				#ifdef pot2Pin
-					case pot2Pin:
-						sampler->selectedSample = map(read, 1023, 0, 0, numSamples - 1);
-				#endif
-			}
-		break;
-		case UIViewMenu:
-			switch(pin) {
-				#ifdef pot2Pin
-					case pot2Pin:
-						sequencer.setTempo(map(read, 1023, 0, 60, 300));
-					break;
-				#endif
-				default:
-					//Serial.print(pin, DEC);
-					//Serial.print(": ");
-					//Serial.println(read, DEC);
-				break;
-			}
+				}
+		}
 	}
-}
+#endif
 
 #ifdef AnalogInputs_h
 	ISR(inputsInterrupt) {
