@@ -285,12 +285,13 @@ void screenMenuOnClick(byte id) {
 					synths[UIView]->midiToggle();
 				break;
 				case 2:
-					if(synths[UIView]->sequencerStatus == 2) synths[UIView]->clearSequencer();
-					else synths[UIView]->sequencerStatus++;
-				break;
-				case 3:
 					if(!sdStatus) return;
 					renderSequenceLoader();
+				break;
+				case 3:
+					if(synths[UIView]->sequencerStatus == 2) synths[UIView]->clearSequencer();
+					else synths[UIView]->sequencerStatus++;
+					
 					//synths[UIView]->saveSequence();
 					
 					//synths[UIView]->chainSawToggle();
@@ -418,6 +419,8 @@ void introOnTouch(byte id) {
 
 #if defined(accelerometerXPin) || defined(accelerometerYPin) || defined(accelerometerZPin)
 	void accelerometerOnChange(byte pin, int read) {
+		bool ao = autoOrientation;
+
 		#ifdef accelerometerXPin
 			const int x = analogInputs.get(accelerometerXPin)->read;
 		#else
@@ -437,10 +440,13 @@ void introOnTouch(byte id) {
 		switch(UIView) {
 			case UIViewSynth1:
 			case UIViewSynth2:
-				synths[UIView]->accelerometer(x, y, z);
+				if(synths[UIView]->axis[2] != 255 || synths[UIView]->axis[3] != 255 || synths[UIView]->axis[4] != 255) {
+					synths[UIView]->accelerometer(x, y, z);
+					ao = 0;
+				}
 		}
 
-		if(!autoOrientation) return;
+		if(!ao) return;
 		if(y > 580) {
 			if(orientation != LANDSCAPE) setOrientation(LANDSCAPE);
 		} else if(orientation != PORTRAIT) setOrientation(PORTRAIT);
