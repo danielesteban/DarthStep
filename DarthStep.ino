@@ -55,7 +55,8 @@ byte orientation = LANDSCAPE,
 
 bool photoResistorEnabled = 0,
 	photoResistorCalibrate = 0,
-	autoOrientation = 1;
+	autoOrientation = 1,
+	sdStatus = 0;
 
 unsigned int photoResistorMax = 0,
 	photoResistorMin = 1023;
@@ -67,7 +68,7 @@ unsigned long photoResistorCalibrateStart = 0;
 	#if defined(accelerometerXPin) || defined(accelerometerYPin) || defined(accelerometerZPin)
 		void accelerometerOnChange(byte pin, int read);
 	#endif
-	AnalogInputs analogInputs(onChange);
+	AnalogInputs analogInputs(onChange, 25);
 #endif
 Midi midi(Serial1);
 Synth * synths[numSynths] = {
@@ -150,7 +151,7 @@ void setup() {
 
 	midi.begin();
 
-	SD.begin();
+	sdStatus = SD.begin();
 	
 	//set PORTF to all outputs- these bits will be used to send audio data to the R2R DAC
 	DDRF = 0xFF;
@@ -288,6 +289,7 @@ void screenMenuOnClick(byte id) {
 					else synths[UIView]->sequencerStatus++;
 				break;
 				case 3:
+					if(!sdStatus) return;
 					renderSequenceLoader();
 					//synths[UIView]->saveSequence();
 					
@@ -304,9 +306,11 @@ void screenMenuOnClick(byte id) {
 		break;
 		case UIViewSynthConfig:
 			switch(id) {
-				case 3:
-					((SynthConfig *) UIViews[UIViewSynthConfig])->toggleMode();
-				break;
+				#if defined(accelerometerXPin) || defined(accelerometerYPin) || defined(accelerometerZPin)
+					case 3:
+						((SynthConfig *) UIViews[UIViewSynthConfig])->toggleMode();
+					break;
+				#endif
 				case 4:
 					setUIView(((SynthConfig *) UIViews[UIViewSynthConfig])->_synth == synths[0] ? UIViewSynth1 : UIViewSynth2); //Lame!
 					delete UIViews[UIViewSynthConfig];
