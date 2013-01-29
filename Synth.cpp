@@ -345,7 +345,7 @@ void Synth::onTouchEnd() {
 	setNote(selectedNote);
 	_circle[0] = -1;
 	_circle[1] = -1;
-	_touching = false;
+	_touching = _chainSaw = false;
 }
 
 void Synth::renderNote() {
