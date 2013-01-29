@@ -64,6 +64,9 @@ unsigned long photoResistorCalibrateStart = 0;
 
 #ifdef AnalogInputs_h
 	void onChange(byte pin, int read);
+	#if defined(accelerometerXPin) || defined(accelerometerYPin) || defined(accelerometerZPin)
+		void accelerometerOnChange(byte pin, int read);
+	#endif
 	AnalogInputs analogInputs(onChange);
 #endif
 Midi midi(Serial1);
@@ -133,13 +136,13 @@ void setup() {
 		analogInputs.setup(photoResistorPin);
 	#endif
 	#ifdef accelerometerXPin
-		analogInputs.setup(accelerometerXPin);
+		analogInputs.setup(accelerometerXPin, accelerometerOnChange);
 	#endif
 	#ifdef accelerometerYPin
-		analogInputs.setup(accelerometerYPin);
+		analogInputs.setup(accelerometerYPin, accelerometerOnChange);
 	#endif
 	#ifdef accelerometerZPin
-		analogInputs.setup(accelerometerZPin);
+		analogInputs.setup(accelerometerZPin, accelerometerOnChange);
 	#endif
 
 	touch.InitTouch(orientation);
@@ -180,10 +183,8 @@ void setup() {
 	sei(); //allow interrupts
 
 	//debug
-	Serial.begin(115200);
-
-	//UIViews[UIViewSynthConfig] = new SynthConfig(synths[0]);
-	//setUIView(UIViewSynthConfig);
+	//Serial.begin(115200);
+	//setUIView(UIViewSynth1);
 }
 
 void screenMenuOnClick(byte id);
@@ -364,33 +365,6 @@ void introOnTouch(byte id) {
 
 #ifdef AnalogInputs_h
 	void onChange(byte pin, int read) {
-		#if defined(accelerometerXPin) || defined(accelerometerYPin) || defined(accelerometerZPin)
-			switch(pin) {
-				#ifdef accelerometerXPin
-					case accelerometerXPin:
-						Serial.print("X: ");
-						Serial.println(read, DEC);
-					break;
-				#endif
-				#ifdef accelerometerYPin
-					case accelerometerYPin:
-						//Serial.print("Y: ");
-						//Serial.println(read, DEC);
-						if(!autoOrientation) return;
-						if(read > 580) {
-							if(orientation != LANDSCAPE) setOrientation(LANDSCAPE);
-						} else if(orientation != PORTRAIT) setOrientation(PORTRAIT);
-					break;
-				#endif
-				#ifdef accelerometerZPin
-					case accelerometerZPin:
-						//Serial.print("Z: ");
-						//Serial.println(read, DEC);
-					break;
-				#endif
-			}
-		#endif
-
 		switch(UIView) {
 			case UIViewSynth1:
 			case UIViewSynth2:
@@ -435,6 +409,37 @@ void introOnTouch(byte id) {
 					#endif
 				}
 		}
+	}
+#endif
+
+#if defined(accelerometerXPin) || defined(accelerometerYPin) || defined(accelerometerZPin)
+	void accelerometerOnChange(byte pin, int read) {
+		#ifdef accelerometerXPin
+			int x = analogInputs.get(accelerometerXPin)->read;
+		#else
+			int x = -1;
+		#endif
+		#ifdef accelerometerYPin
+			int y = analogInputs.get(accelerometerYPin)->read;
+		#else
+			int y = -1;
+		#endif
+		#ifdef accelerometerZPin
+			int z = analogInputs.get(accelerometerZPin)->read;
+		#else
+			int z = -1;
+		#endif
+
+		switch(UIView) {
+			case UIViewSynth1:
+			case UIViewSynth2:
+				synths[UIView]->accelerometer(x, y, z);
+		}
+
+		if(!autoOrientation) return;
+		if(y > 580) {
+			if(orientation != LANDSCAPE) setOrientation(LANDSCAPE);
+		} else if(orientation != PORTRAIT) setOrientation(PORTRAIT);
 	}
 #endif
 

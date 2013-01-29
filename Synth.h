@@ -35,6 +35,7 @@ class Synth : public UI {
         int output();
         void chainSawTick();
         void midiToggle();
+        void accelerometer(int x, int y, int z);
         void sequencerTick(byte tempoStep);
         void clearSequencer();
         void saveSequence();
