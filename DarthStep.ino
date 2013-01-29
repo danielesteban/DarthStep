@@ -184,7 +184,7 @@ void setup() {
 	sei(); //allow interrupts
 
 	//debug
-	Serial.begin(115200);
+	//Serial.begin(115200);
 	//setUIView(UIViewSynth1);
 }
 

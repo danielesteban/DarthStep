@@ -44,7 +44,7 @@ void Mixer::update() {
 void Mixer::renderSlider(byte id, int gain) {
 	int w = (_tft.getDisplayXSize() - 11) / 3,
 		x = 10 + (w * id),
-		y = 22 + ((long) (256 - gain) * (_tft.getDisplayYSize() - 50 - 22) / 256);
+		y = 22 + ((long) ((id == 0 ? 256 : 128) - gain) * (_tft.getDisplayYSize() - 50 - 22) / (id == 0 ? 256 : 128));
 
 	_tft.setColor(65, 65, 65);
     _tft.fillRect(x, 22, x + w - 10, y);
@@ -71,7 +71,7 @@ void Mixer::onTouch(byte orientation, int x, int y) {
 	y > h && (y = h);
 	byte id = (x - 21) / ((_tft.getDisplayXSize() - 21) / 3);
 	
-	unsigned int val = (h - y) * 256 / h;
+	unsigned int val = (h - y) * (id == 0 ? 256 : 128) / h;
 
 	switch(id) {
 		case 0:
