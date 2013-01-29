@@ -21,7 +21,7 @@ typedef struct synthSequence {
     byte note;
     unsigned int gain;
     byte chainSawInterval;
-    int circle[2];
+    //int circle[2];
 } synthSequence;
 
 class Synth : public UI {

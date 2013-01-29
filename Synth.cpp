@@ -176,8 +176,8 @@ void Synth::sequencerTick(byte tempoStep) {
 				(axis[0] == 0 || axis[1] == 0) && (_sequencerSteps[tempoStep].note = selectedNote);
 				(axis[0] == 1 || axis[1] == 1) && (_sequencerSteps[tempoStep].gain = gain);
 				(axis[0] == 2 || axis[1] == 2) && (_sequencerSteps[tempoStep].chainSawInterval = _chainSawInterval);
-				_sequencerSteps[tempoStep].circle[0] = _circle[0];
-				_sequencerSteps[tempoStep].circle[1] = _circle[1];
+				//_sequencerSteps[tempoStep].circle[0] = _circle[0];
+				//_sequencerSteps[tempoStep].circle[1] = _circle[1];
 			}
 		case 2: //playing
 			if((!_touching || (axis[0] != 0 && axis[1] != 0)) && selectedNote != _sequencerSteps[tempoStep].note) {
@@ -186,10 +186,10 @@ void Synth::sequencerTick(byte tempoStep) {
 			}
 			(!_touching || (axis[0] != 1 && axis[1] != 1)) && (gain = _sequencerSteps[tempoStep].gain);
 			(!_touching || (axis[0] != 2 && axis[1] != 2)) && (_chainSawInterval = _sequencerSteps[tempoStep].chainSawInterval);
-			if(!_touching) {
+			/*if(!_touching) {
 				_circle[0] = _sequencerSteps[tempoStep].circle[0];
 				_circle[1] = _sequencerSteps[tempoStep].circle[1];
-			}
+			}*/
 	}
 	_tempoStep = tempoStep / 16;
 }
@@ -199,8 +199,8 @@ void Synth::clearSequencer() {
 		_sequencerSteps[x].note = 255;
 		_sequencerSteps[x].gain = (1 << _sampleBits) / 8;
 		_sequencerSteps[x].chainSawInterval = 255;
-		_sequencerSteps[x].circle[0] = -1;
-		_sequencerSteps[x].circle[1] = -1;
+		//_sequencerSteps[x].circle[0] = -1;
+		//_sequencerSteps[x].circle[1] = -1;
 	}
 	sequencerStatus = 0; //Stop sequencer
 	setNote(255);
@@ -233,9 +233,9 @@ void Synth::saveSequence() {
 		f.print(",");
 		f.print(_sequencerSteps[x].chainSawInterval);
 		f.print(",");
-		f.print(_sequencerSteps[x].circle[0]);
+		//f.print(_sequencerSteps[x].circle[0]);
 		f.print(",");
-		f.println(_sequencerSteps[x].circle[1]);
+		//f.println(_sequencerSteps[x].circle[1]);
 	}
 	f.close();
 	SD.remove("/SEQS/LAST");
@@ -274,10 +274,11 @@ void Synth::loadSequence(String name) {
 					_sequencerSteps[x].chainSawInterval = atoi(buf);
 				break;
 				case 3:
-					_sequencerSteps[x].circle[0] = atoi(buf);
+					//_sequencerSteps[x].circle[0] = atoi(buf);
 				break;
 				case 4:
-					_sequencerSteps[x].circle[1] = atoi(buf);
+					//_sequencerSteps[x].circle[1] = atoi(buf);
+				break;
 			}
 			c = 0;
 			for(byte y=0; y<4; y++) buf[y] = NULL;

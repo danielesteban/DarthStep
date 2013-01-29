@@ -419,19 +419,19 @@ void introOnTouch(byte id) {
 #if defined(accelerometerXPin) || defined(accelerometerYPin) || defined(accelerometerZPin)
 	void accelerometerOnChange(byte pin, int read) {
 		#ifdef accelerometerXPin
-			int x = analogInputs.get(accelerometerXPin)->read;
+			const int x = analogInputs.get(accelerometerXPin)->read;
 		#else
-			int x = -1;
+			const int x = -1;
 		#endif
 		#ifdef accelerometerYPin
-			int y = analogInputs.get(accelerometerYPin)->read;
+			const int y = analogInputs.get(accelerometerYPin)->read;
 		#else
-			int y = -1;
+			const int y = -1;
 		#endif
 		#ifdef accelerometerZPin
-			int z = analogInputs.get(accelerometerZPin)->read;
+			const int z = analogInputs.get(accelerometerZPin)->read;
 		#else
-			int z = -1;
+			const int z = -1;
 		#endif
 
 		switch(UIView) {
