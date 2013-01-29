@@ -155,8 +155,7 @@ void Synth::accelerometer(int x, int y, int z) {
 	Serial.print(" ");
 	Serial.println(max, DEC);*/
 
-	//const int min = 400, max = 900;
-	const int min = 500, max = 800;
+	const int min = 200, max = 600;
 	
 	if(axis[2] == 0 || axis[3] == 0 || axis[4] == 0) {
 		selectedNote = map(constrain(axis[2] == 0 ? x : axis[3] == 0 ? y : z, min, max), min, max, numNotes * _selectedOctave, (numNotes * (_selectedOctave + 2)) - 1);

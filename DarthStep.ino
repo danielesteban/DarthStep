@@ -184,7 +184,7 @@ void setup() {
 	sei(); //allow interrupts
 
 	//debug
-	//Serial.begin(115200);
+	Serial.begin(115200);
 	//setUIView(UIViewSynth1);
 }
 
@@ -376,12 +376,12 @@ void introOnTouch(byte id) {
 				switch(pin) {
 					#ifdef pot1Pin
 						case pot1Pin:
-							synths[UIView]->setScale(map(read, 0, 1023, 0, synths[UIView]->numScales - 1));
+							synths[UIView]->setScale(map(read, 1023, 0, 0, synths[UIView]->numScales - 1));
 						break;
 					#endif
 					#ifdef pot2Pin
 						case pot2Pin:
-							synths[UIView]->setOctave(map(read, 1023, 0, 0, synths[UIView]->numOctaves - 2));
+							synths[UIView]->setOctave(map(read, 0, 1023, 0, synths[UIView]->numOctaves - 2));
 						break;
 					#endif
 					#ifdef photoResistorPin
@@ -397,12 +397,12 @@ void introOnTouch(byte id) {
 				switch(pin) {
 					#ifdef pot1Pin
 						case pot1Pin:
-							sampler->sampleQuantization[sampler->selectedSample] = pow(2, map(read, 0, 1023, 2, 5)) + 1;
+							sampler->sampleQuantization[sampler->selectedSample] = pow(2, map(read, 1023, 0, 2, 5)) + 1;
 						break;
 					#endif
 					#ifdef pot2Pin
 						case pot2Pin:
-							sampler->selectedSample = map(read, 1023, 0, 0, numSamples - 1);
+							sampler->selectedSample = map(read, 0, 1023, 0, numSamples - 1);
 					#endif
 				}
 			break;
@@ -410,7 +410,7 @@ void introOnTouch(byte id) {
 				switch(pin) {
 					#ifdef pot2Pin
 						case pot2Pin:
-							sequencer.setTempo(map(read, 1023, 0, 60, 300));
+							sequencer.setTempo(map(read, 0, 1023, 60, 300));
 					#endif
 				}
 		}
@@ -447,7 +447,7 @@ void introOnTouch(byte id) {
 		}
 
 		if(!ao) return;
-		if(y > 580) {
+		if(y < 450) {
 			if(orientation != LANDSCAPE) setOrientation(LANDSCAPE);
 		} else if(orientation != PORTRAIT) setOrientation(PORTRAIT);
 	}
