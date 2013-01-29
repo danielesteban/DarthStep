@@ -387,9 +387,9 @@ void introOnTouch(byte id) {
 					#ifdef photoResistorPin
 						case photoResistorPin:
 							if(!photoResistorEnabled || photoResistorCalibrate) return;
-							read = constrain(map(constrain(read, photoResistorMin, photoResistorMax), photoResistorMin, photoResistorMax, synths[UIView]->selectedNote, synths[UIView]->selectedNote + (synths[UIView]->numNotes * 2)), 0, (synths[UIView]->numNotes * synths[UIView]->numOctaves) - 1);
+							/*read = constrain(map(constrain(read, photoResistorMin, photoResistorMax), photoResistorMin, photoResistorMax, synths[UIView]->selectedNote, synths[UIView]->selectedNote + (synths[UIView]->numNotes * 2)), 0, (synths[UIView]->numNotes * synths[UIView]->numOctaves) - 1);
 							if(synths[UIView]->note == read) return;
-							synths[UIView]->setNote(read);
+							synths[UIView]->setNote(read);*/
 					#endif
 				}
 			break;

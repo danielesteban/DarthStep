@@ -28,7 +28,7 @@ const String noteNames[12] = {"C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "
 
 Synth::Synth(int sampleRate, Midi midi, byte midiChannel) : UI() {
 	byte x;
-	axis[0] = axis[4] = _chainSawInterval = note = 255;
+	axis[0] = axis[4] = _chainSawInterval = _note = 255;
 	waveOn = 1;
 	_output = 0;
 	gain = (1 << _sampleBits) / 4;
@@ -36,7 +36,6 @@ Synth::Synth(int sampleRate, Midi midi, byte midiChannel) : UI() {
 		waveGain[x] = 1 << _sampleBits;
  		waves[x] = new Wave(WaveShapeSquare, sampleRate);
  	}
- 	selectedNote = note;
  	axis[3] = _chainSaw = _chainSawLastLoop = _midiEnabled = _selectedRoot = _tempoStep = _touching = mute = 0;
  	axis[1] = _selectedOctave = _selectedScale = 1;
 	axis[2] = 2;
@@ -60,7 +59,7 @@ void Synth::setScale(byte id, byte root) {
 	const byte offset = (numNotes - 1) * id;
 	byte octave, nt,
 		n[numNotes],
-		cn = note,
+		cn = _note,
 		c = 0;
 
 	_selectedScale = id;
@@ -75,36 +74,37 @@ void Synth::setScale(byte id, byte root) {
 			c++;
 		}
 	}
-	if(sequencerStatus == 0 && cn != 255) setNote(note);
+	if(sequencerStatus == 0 && cn != 255) setNote(_note);
 }
 
 void Synth::setNote(byte nt) {
-	if(_midiEnabled && note != 255) {
+	if(_note == nt) return;
+	if(_midiEnabled && _note != 255) {
 		for(byte x=0; x<numWaves; x++) {
 			if(!(waveOn & (1 << x))) continue;
-			_midi.sendNoteOff(_scale[note] + _waveNoteOffset[x], map(/*waveGain[x]*/ gain, 0, 1 << _sampleBits, 0, 127), _midiChannel);
+			_midi.sendNoteOff(_scale[_note] + _waveNoteOffset[x], map(/*waveGain[x]*/ gain, 0, 1 << _sampleBits, 0, 127), _midiChannel);
 		}
 	}
-	note = nt;
+	_note = nt;
 	if(nt == 255) return;
 	for(byte x=0; x<numWaves; x++) {
-		waves[x]->setFrequency(pgm_read_word_near(midiNotes + (_scale[note] + _waveNoteOffset[x])));
-		if(_midiEnabled && waveOn & (1 << x)) _midi.sendNoteOn(_scale[note] + _waveNoteOffset[x], map(/*waveGain[x]*/ gain, 0, 1 << _sampleBits, 0, 127), _midiChannel);
+		waves[x]->setFrequency(pgm_read_word_near(midiNotes + (_scale[_note] + _waveNoteOffset[x])));
+		if(_midiEnabled && waveOn & (1 << x)) _midi.sendNoteOn(_scale[_note] + _waveNoteOffset[x], map(/*waveGain[x]*/ gain, 0, 1 << _sampleBits, 0, 127), _midiChannel);
 	}
 }
 
 void Synth::setOctave(byte id) {
 	if(_selectedOctave == id) return;
-	const byte noteIndex = selectedNote - (_selectedOctave * numNotes);
+	const byte noteIndex = _note - (_selectedOctave * numNotes);
 	_selectedOctave = id;
-	if(note != 255) {
-		selectedNote != 255 && (selectedNote = (_selectedOctave * numNotes) + noteIndex);
-		if(sequencerStatus == 0) setNote(selectedNote);
+	if(_note != 255) {
+		_note != 255 && (_note = (_selectedOctave * numNotes) + noteIndex);
+		if(sequencerStatus == 0) setNote(_note);
 	}
 }
 
 int Synth::output() {
-	if(!mute && !_chainSaw && note != 255) {
+	if(!mute && !_chainSaw && _note != 255) {
 		_output = 0;
 		for(byte i=0; i<numWaves; i++) {
 			if(!(waveOn & (1 << i))) continue;
@@ -119,29 +119,29 @@ int Synth::output() {
 }
 
 void Synth::chainSawTick() {
-	if(_chainSawInterval == 255 || !waveOn || note == 255) return;
+	if(_chainSawInterval == 255 || !waveOn || _note == 255) return;
 	unsigned long t = millis();
 	if(t >= _chainSawLastLoop + _chainSawInterval) {
 		_chainSawLastLoop = t;
 		_chainSaw = false;
-		if(_midiEnabled && note != 255) for(byte x=0; x<numWaves; x++) {
+		if(_midiEnabled && _note != 255) for(byte x=0; x<numWaves; x++) {
 			if(!(waveOn & (1 << x))) continue;
-			_midi.sendNoteOn(_scale[note] + _waveNoteOffset[x], map(/*waveGain[x]*/ gain, 0, 1 << _sampleBits, 0, 127), _midiChannel);
+			_midi.sendNoteOn(_scale[_note] + _waveNoteOffset[x], map(/*waveGain[x]*/ gain, 0, 1 << _sampleBits, 0, 127), _midiChannel);
 		}
 	} else if(!_chainSaw && t >= _chainSawLastLoop + (_chainSawInterval / (_chainSawInterval > 250 ? 4 : _chainSawInterval > 50 ? 3 : 2))) {
 		_chainSaw = true;
-		if(_midiEnabled && note != 255) for(byte x=0; x<numWaves; x++) {
+		if(_midiEnabled && _note != 255) for(byte x=0; x<numWaves; x++) {
 			if(!(waveOn & (1 << x))) continue;
-			_midi.sendNoteOff(_scale[note] + _waveNoteOffset[x], map(/*waveGain[x]*/ gain, 0, 1 << _sampleBits, 0, 127), _midiChannel);
+			_midi.sendNoteOff(_scale[_note] + _waveNoteOffset[x], map(/*waveGain[x]*/ gain, 0, 1 << _sampleBits, 0, 127), _midiChannel);
 		}
 	}
 }
 
 void Synth::midiToggle() {
 	_midiEnabled = !_midiEnabled;
-	if(!_midiEnabled && !_chainSaw && note != 255) for(byte x=0; x<numWaves; x++) {
+	if(!_midiEnabled && !_chainSaw && _note != 255) for(byte x=0; x<numWaves; x++) {
 		if(!(waveOn & (1 << x))) continue;
-		_midi.sendNoteOff(_scale[note] + _waveNoteOffset[x], map(/*waveGain[x]*/ gain, 0, 1 << _sampleBits, 0, 127), _midiChannel);
+		_midi.sendNoteOff(_scale[_note] + _waveNoteOffset[x], map(/*waveGain[x]*/ gain, 0, 1 << _sampleBits, 0, 127), _midiChannel);
 	}
 }
 
@@ -158,10 +158,7 @@ void Synth::accelerometer(int x, int y, int z) {
 
 	const int min = 180, max = 480;
 	
-	if(axis[2] == 0 || axis[3] == 0 || axis[4] == 0) {
-		selectedNote = map(constrain(axis[2] == 0 ? x : axis[3] == 0 ? y : z, min, max), min, max, numNotes * _selectedOctave, (numNotes * (_selectedOctave + 2)) - 1);
-		if(note != selectedNote) setNote(selectedNote);
-	}
+	if(axis[2] == 0 || axis[3] == 0 || axis[4] == 0) setNote(map(constrain(axis[2] == 0 ? x : axis[3] == 0 ? y : z, min, max), min, max, numNotes * _selectedOctave, (numNotes * (_selectedOctave + 2)) - 1));
 	(axis[2] == 1 || axis[3] == 1 || axis[4] == 1) && (gain = map(constrain(axis[2] == 1 ? x : axis[3] == 1 ? y : z, min, max), min, max, 0, (1 << _sampleBits) / 2));
 	(axis[2] == 2 || axis[3] == 2 || axis[4] == 2) && (_chainSawInterval = map(constrain(axis[2] == 2 ? x : axis[3] == 2 ? y : z, min, max), min, max, 250, 10));
 }
@@ -173,17 +170,14 @@ void Synth::sequencerTick(byte tempoStep) {
 		break;
 		case 1: //recording
 			if(_touching) {
-				(axis[0] == 0 || axis[1] == 0 || axis[2] == 0 || axis[3] == 0 || axis[4] == 0) && (_sequencerSteps[tempoStep].note = selectedNote);
+				(axis[0] == 0 || axis[1] == 0 || axis[2] == 0 || axis[3] == 0 || axis[4] == 0) && (_sequencerSteps[tempoStep].note = _note);
 				(axis[0] == 1 || axis[1] == 1 || axis[2] == 1 || axis[3] == 1 || axis[4] == 1) && (_sequencerSteps[tempoStep].gain = gain);
 				(axis[0] == 2 || axis[1] == 2 || axis[2] == 2 || axis[3] == 2 || axis[4] == 2) && (_sequencerSteps[tempoStep].chainSawInterval = _chainSawInterval);
 				//_sequencerSteps[tempoStep].circle[0] = _circle[0];
 				//_sequencerSteps[tempoStep].circle[1] = _circle[1];
 			}
 		case 2: //playing
-			if((!_touching || (axis[0] != 0 && axis[1] != 0 && axis[2] != 0 && axis[3] != 0 && axis[4] != 0)) && selectedNote != _sequencerSteps[tempoStep].note) {
-				selectedNote = _sequencerSteps[tempoStep].note;
-				setNote(selectedNote);
-			}
+			if((!_touching || (axis[0] != 0 && axis[1] != 0 && axis[2] != 0 && axis[3] != 0 && axis[4] != 0)) && _note != _sequencerSteps[tempoStep].note) setNote(_sequencerSteps[tempoStep].note);
 			(!_touching || (axis[0] != 1 && axis[1] != 1 && axis[2] != 1 && axis[3] != 1 && axis[4] != 1)) && (gain = _sequencerSteps[tempoStep].gain);
 			(!_touching || (axis[0] != 2 && axis[1] != 2 && axis[2] != 2 && axis[3] != 2 && axis[4] != 2)) && (_chainSawInterval = _sequencerSteps[tempoStep].chainSawInterval);
 			/*if(!_touching) {
@@ -323,10 +317,7 @@ void Synth::update() {
 }
 
 void Synth::onTouch(byte orientation, int x, int y) {
-	if(axis[0] == 0 || axis[1] == 0) {
-		selectedNote = map(axis[1] == 0 ? y : x, (axis[1] == 0 ? _tft.getDisplayYSize() - 1 : 0), (axis[1] == 0 ? 0 : _tft.getDisplayXSize() - 1), numNotes * _selectedOctave, (numNotes * (_selectedOctave + 2)) - 1);
-		if(note != selectedNote) setNote(selectedNote);
-	}
+	if(axis[0] == 0 || axis[1] == 0) setNote(map(axis[1] == 0 ? y : x, (axis[1] == 0 ? _tft.getDisplayYSize() - 1 : 0), (axis[1] == 0 ? 0 : _tft.getDisplayXSize() - 1), numNotes * _selectedOctave, (numNotes * (_selectedOctave + 2)) - 1));
 	(axis[0] == 1 || axis[1] == 1) && (gain = map(axis[0] == 1 ? x : y, (axis[0] == 1 ? 0 : _tft.getDisplayYSize() - 1), (axis[0] == 1 ? _tft.getDisplayXSize() - 1 : 0), 0, (1 << _sampleBits) / 2));
 	(axis[0] == 2 || axis[1] == 2) && (_chainSawInterval = map(axis[0] == 2 ? x : y, (axis[0] == 2 ? 0 : _tft.getDisplayYSize() - 1), (axis[0] == 2 ? _tft.getDisplayXSize() - 1 : 0), 250, 10));
 	x < 10 && (x = 10);
@@ -341,16 +332,16 @@ void Synth::onTouch(byte orientation, int x, int y) {
 
 void Synth::onTouchEnd() {
 	if(!_touching) return;
-	selectedNote = _chainSawInterval = 255;
-	setNote(selectedNote);
+	_chainSawInterval = 255;
+	setNote(255);
 	_circle[0] = -1;
 	_circle[1] = -1;
 	_touching = _chainSaw = false;
 }
 
 void Synth::renderNote() {
-	if(selectedNote == _renderedNote) return;
-	_renderedNote = selectedNote;
+	if(_note == _renderedNote) return;
+	_renderedNote = _note;
 
 	int x = ((_tft.getDisplayXSize() - 1) / 2),
 		y = ((_tft.getDisplayYSize() - 1) / 2);

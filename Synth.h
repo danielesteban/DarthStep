@@ -30,7 +30,6 @@ class Synth : public UI {
         void render(UTFT tft);
         void update();
         void setScale(byte id);
-        void setNote(byte nt);
         void setOctave(byte id);
         int output();
         void chainSawTick();
@@ -46,9 +45,7 @@ class Synth : public UI {
             numOctaves = 7,
             numScales = 13;
 
-        byte note,
-            selectedNote,
-            waveOn,
+        byte waveOn,
             sequencerStatus,
             axis[5];
 
@@ -64,7 +61,8 @@ class Synth : public UI {
 
         static const byte _sampleBits = 8;
 
-        byte _midiChannel, 
+        byte _note, 
+            _midiChannel, 
             _selectedOctave,
             _selectedScale,
             _selectedRoot,
@@ -94,6 +92,7 @@ class Synth : public UI {
         byte _tempoStep,
             _renderedTempoStep;
 
+        void setNote(byte nt);
         void setScale(byte id, byte root);
         void onTouch(byte orientation, int x, int y);
         void onTouchEnd();
