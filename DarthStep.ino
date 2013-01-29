@@ -65,11 +65,18 @@ unsigned long photoResistorCalibrateStart = 0;
 
 #ifdef AnalogInputs_h
 	void onChange(byte pin, int read);
-	#if defined(accelerometerXPin) || defined(accelerometerYPin) || defined(accelerometerZPin)
-		void accelerometerOnChange(byte pin, int read);
-	#endif
 	AnalogInputs analogInputs(onChange, 25);
 #endif
+#ifdef photoResistorPin
+	void photoResistorOnChange(byte pin, int read);
+	void photoResistorEnable(byte enabled);
+#else
+	#define photoResistorEnable (NULL)
+#endif
+#if defined(accelerometerXPin) || defined(accelerometerYPin) || defined(accelerometerZPin)
+	void accelerometerOnChange(byte pin, int read);
+#endif
+
 Midi midi(Serial1);
 Synth * synths[numSynths] = {
 	new Synth(sampleRate, midi, synthsMidiChannels[0]),
@@ -134,7 +141,7 @@ void setup() {
 		analogInputs.setup(pot2Pin);
 	#endif
 	#ifdef photoResistorPin
-		analogInputs.setup(photoResistorPin);
+		analogInputs.setup(photoResistorPin, photoResistorOnChange);
 	#endif
 	#ifdef accelerometerXPin
 		analogInputs.setup(accelerometerXPin, accelerometerOnChange);
@@ -185,29 +192,16 @@ void setup() {
 
 	//debug
 	//Serial.begin(115200);
-	//setUIView(UIViewSynth1);
+	//UIViews[UIViewSynthConfig] = new SynthConfig(synths[UIViewSynth1], photoResistorEnable);
+	//setUIView(UIViewSynthConfig);
 }
 
 void screenMenuOnClick(byte id);
 
 void loop(void) {
-	if(UIViews[UIView]->rendered) {
-		UIViews[UIView]->update();
-		UIViews[UIView]->readTouch(tft, touch, orientation, screenMenuOnClick);
-	}
-	
-	#ifdef photoResistorPin
-		if(!photoResistorEnabled || !photoResistorCalibrate) return;
-		if(photoResistorCalibrateStart == 0) {
-			photoResistorCalibrateStart = millis();
-			photoResistorMax = 0;
-			photoResistorMin = 1023;
-		}
-		const unsigned int read = analogInputs.get(photoResistorPin)->read;
-		photoResistorMax < read && (photoResistorMax = read);
-		photoResistorMin > read && (photoResistorMin = read);
-		photoResistorCalibrateStart <= millis() - 1000 && (photoResistorCalibrateStart = photoResistorCalibrate = 0);
-	#endif
+	if(!UIViews[UIView]->rendered) return;
+	UIViews[UIView]->update();
+	UIViews[UIView]->readTouch(tft, touch, orientation, screenMenuOnClick);
 }
 
 void sequenceLoaderOnClick(byte id) {
@@ -261,7 +255,7 @@ void renderSequenceLoader() {
 
 void renderSynthConfig() {
 	if(UIViews[UIViewSynthConfig] != NULL) delete UIViews[UIViewSynthConfig];
-	UIViews[UIViewSynthConfig] = new SynthConfig(synths[UIView]);
+	UIViews[UIViewSynthConfig] = new SynthConfig(synths[UIView], photoResistorEnable);
 	setUIView(UIViewSynthConfig);
 }
 
@@ -384,13 +378,6 @@ void introOnTouch(byte id) {
 							synths[UIView]->setOctave(map(read, 0, 1023, 0, synths[UIView]->numOctaves - 2));
 						break;
 					#endif
-					#ifdef photoResistorPin
-						case photoResistorPin:
-							if(!photoResistorEnabled || photoResistorCalibrate) return;
-							/*read = constrain(map(constrain(read, photoResistorMin, photoResistorMax), photoResistorMin, photoResistorMax, synths[UIView]->selectedNote, synths[UIView]->selectedNote + (synths[UIView]->numNotes * 2)), 0, (synths[UIView]->numNotes * synths[UIView]->numOctaves) - 1);
-							if(synths[UIView]->note == read) return;
-							synths[UIView]->setNote(read);*/
-					#endif
 				}
 			break;
 			case UIViewSampler:
@@ -414,6 +401,29 @@ void introOnTouch(byte id) {
 					#endif
 				}
 		}
+	}
+#endif
+
+#ifdef photoResistorPin
+	void photoResistorOnChange(byte pin, int read) {
+		if(!photoResistorEnabled) return;
+		if(photoResistorCalibrate) {
+			if(photoResistorCalibrateStart == 0) {
+				photoResistorCalibrateStart = millis();
+				photoResistorMax = 0;
+				photoResistorMin = 1023;
+			}
+			photoResistorMax < read && (photoResistorMax = read);
+			photoResistorMin > read && (photoResistorMin = read);
+			photoResistorCalibrateStart <= millis() - 2000 && (photoResistorCalibrateStart = photoResistorCalibrate = 0);
+			return;
+		} else if(UIView >= numSynths) return;
+		if(synths[UIView]->axis[5] != 255) synths[UIView]->photoResistor(constrain(read, photoResistorMin, photoResistorMax), photoResistorMin, photoResistorMax);
+	}
+
+	void photoResistorEnable(byte enabled) {
+		if(enabled && !photoResistorEnabled) photoResistorCalibrate = 1;
+		photoResistorEnabled = enabled;
 	}
 #endif
 

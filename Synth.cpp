@@ -28,7 +28,7 @@ const String noteNames[12] = {"C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "
 
 Synth::Synth(int sampleRate, Midi midi, byte midiChannel) : UI() {
 	byte x;
-	axis[0] = axis[4] = _chainSawInterval = _note = 255;
+	axis[0] = axis[4] = axis[5] = _chainSawInterval = _note = 255;
 	waveOn = 1;
 	_output = 0;
 	gain = (1 << _sampleBits) / 4;
@@ -145,22 +145,19 @@ void Synth::midiToggle() {
 	}
 }
 
-/*int max = 0,
-	min = 1023;*/
-
 void Synth::accelerometer(int x, int y, int z) {
-	/*max < y && (max = y);
-	min > y && (min = y);*/
 	if(!_touching) return;
-	/*Serial.print(min, DEC);
-	Serial.print(" ");
-	Serial.println(max, DEC);*/
-
 	const int min = 180, max = 480;
-	
 	if(axis[2] == 0 || axis[3] == 0 || axis[4] == 0) setNote(map(constrain(axis[2] == 0 ? x : axis[3] == 0 ? y : z, min, max), min, max, numNotes * _selectedOctave, (numNotes * (_selectedOctave + 2)) - 1));
 	(axis[2] == 1 || axis[3] == 1 || axis[4] == 1) && (gain = map(constrain(axis[2] == 1 ? x : axis[3] == 1 ? y : z, min, max), min, max, 0, (1 << _sampleBits) / 2));
-	(axis[2] == 2 || axis[3] == 2 || axis[4] == 2) && (_chainSawInterval = map(constrain(axis[2] == 2 ? x : axis[3] == 2 ? y : z, min, max), min, max, 250, 10));
+	(axis[2] == 2 || axis[3] == 2 || axis[4] == 2) && (_chainSawInterval = map(constrain(axis[2] == 2 ? x : axis[3] == 2 ? y : z, min, max), min, max, 255, 10));
+}
+
+void Synth::photoResistor(int read, unsigned int min, unsigned int max) {
+	if(!_touching) return;
+	if(axis[5] == 0) setNote(map(read, min, max, numNotes * _selectedOctave, (numNotes * (_selectedOctave + 2)) - 1));
+	(axis[5] == 1) && (gain = map(read, min, max, 0, (1 << _sampleBits) / 2));
+	(axis[5] == 2) && (_chainSawInterval = map(read, min, max, 255, 10));	
 }
 
 void Synth::sequencerTick(byte tempoStep) {
@@ -319,7 +316,7 @@ void Synth::update() {
 void Synth::onTouch(byte orientation, int x, int y) {
 	if(axis[0] == 0 || axis[1] == 0) setNote(map(axis[1] == 0 ? y : x, (axis[1] == 0 ? _tft.getDisplayYSize() - 1 : 0), (axis[1] == 0 ? 0 : _tft.getDisplayXSize() - 1), numNotes * _selectedOctave, (numNotes * (_selectedOctave + 2)) - 1));
 	(axis[0] == 1 || axis[1] == 1) && (gain = map(axis[0] == 1 ? x : y, (axis[0] == 1 ? 0 : _tft.getDisplayYSize() - 1), (axis[0] == 1 ? _tft.getDisplayXSize() - 1 : 0), 0, (1 << _sampleBits) / 2));
-	(axis[0] == 2 || axis[1] == 2) && (_chainSawInterval = map(axis[0] == 2 ? x : y, (axis[0] == 2 ? 0 : _tft.getDisplayYSize() - 1), (axis[0] == 2 ? _tft.getDisplayXSize() - 1 : 0), 250, 10));
+	(axis[0] == 2 || axis[1] == 2) && (_chainSawInterval = map(axis[0] == 2 ? x : y, (axis[0] == 2 ? 0 : _tft.getDisplayYSize() - 1), (axis[0] == 2 ? _tft.getDisplayXSize() - 1 : 0), 255, 10));
 	x < 10 && (x = 10);
 	x > _tft.getDisplayXSize() - 11 && (x = _tft.getDisplayXSize() - 11);
 	y < 10 && (y = 10);

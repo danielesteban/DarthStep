@@ -1,3 +1,8 @@
+## v2.4 (Feb ??, 2013)
+  
+  - LightResistor support as another axis
+  - SetNote refactoring.
+
 ## v2.3 (Jan 29, 2013)
   
   - 3D Synths! (I'd say 5D ;P)

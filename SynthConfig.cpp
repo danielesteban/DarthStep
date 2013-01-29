@@ -5,9 +5,10 @@
 
 #include "SynthConfig.h"
 
-SynthConfig::SynthConfig(Synth * synth) : UI() {
+SynthConfig::SynthConfig(Synth * synth, TouchEvent photoResistorEnable) : UI() {
     availableOrientations[PORTRAIT] = _mode = 0;
     _synth = synth;
+    _photoResistorEnable = photoResistorEnable;
     byte x;
     for(x=0; x<6+(_synth->numWaves*5); x++) addButton(NULL);
 }
@@ -22,8 +23,8 @@ void SynthConfig::render(UTFT tft) {
     	    for(x=0; x<2; x++) renderAxis(x);
     	    for(x=0; x<_synth->numWaves; x++) renderWave(x);
     	break;
-    	case 1: //accelerometer
-    	    for(x=2; x<5; x++) renderAxis(x);
+    	case 1: //accelerometer & lightResistor
+    	    for(x=2; x<6; x++) renderAxis(x);
     }
 }
 
@@ -37,11 +38,11 @@ void SynthConfig::renderAxis(byte axis) {
         btid = ax * 3;
 
     int bw = (_tft.getDisplayXSize() - 31) / 3,
-        x = 30, y = 10 + (ax * 40);
+        x = 30, y = (axis > 1 ? 40 : 10) + (ax * 40);
 
     _tft.setBackColor(0, 0, 0);
     _tft.setColor(255, 255, 255);
-    _tft.print(ax == 0 ? "X" : ax == 1 ? "Y" : "Z", 10, y + 10);
+    _tft.print(ax == 0 ? "X" : ax == 1 ? "Y" : ax == 2 ? "Z" : "LR", 10, y + 10);
     renderButton(btid, "Pitch", x, y, bw, _synth->axis[axis] == 0);
     renderButton(btid + 1, "Gain", x + bw, y, bw, _synth->axis[axis] == 1);
     renderButton(btid + 2, "ChainSaw", x + bw + bw, y, bw, _synth->axis[axis] == 2);
@@ -133,16 +134,18 @@ void SynthConfig::renderButton(byte id, char * l, int x, int y, int w, bool on) 
 void SynthConfig::onClick(byte id) {
     if(_mode == 1 || id < 6) { //axis
         byte axis = id / 3;
-        _mode == 1 && (axis += 2); //accelerometer
+        _mode == 1 && (axis += 2); //accelerometer & lightResistor
         id = id % 3;
-        for(byte x=0;x<5; x++) {
+        for(byte x=0;x<6; x++) {
             if(x != axis && _synth->axis[x] == id) {
                 _synth->axis[x] = _synth->axis[axis];
                 if((_mode == 0 && x < 2) || (_mode == 1 && x > 1)) renderAxis(x);
+                if(x == 5) _photoResistorEnable(_synth->axis[x] != 255);
                 break;
             }
         }
         _synth->axis[axis] = _synth->axis[axis] == id ? 255 : id;
+        if(axis == 5) _photoResistorEnable(_synth->axis[axis] != 255);
         renderAxis(axis);
     } else { //waves
         id -= 6;

@@ -35,6 +35,7 @@ class Synth : public UI {
         void chainSawTick();
         void midiToggle();
         void accelerometer(int x, int y, int z);
+        void photoResistor(int read, unsigned int min, unsigned int max);
         void sequencerTick(byte tempoStep);
         void clearSequencer();
         void saveSequence();
@@ -47,7 +48,7 @@ class Synth : public UI {
 
         byte waveOn,
             sequencerStatus,
-            axis[5];
+            axis[6];
 
         unsigned int gain,
             waveGain[numWaves];
