@@ -1,9 +1,10 @@
 ## v2.3 (Feb ??, 2013)
   
-  - Accelerometer Basic hardware support
-  - Alpha version of autoOrientation
-  - Sample toggle/clear
-  - Added MakeFile
+  - 3D Synths! (almost 4D ;P)
+  - Accelerometer hardware support.
+  - Alpha version of autoOrientation.
+  - Sampler toggle/clear.
+  - Added Makefile.
   - Some bugfixes and improvements.
 
 ## v2.2 (Jan 28, 2013)
@@ -12,7 +13,7 @@
   - Cool atari like intro UIView.
   - License UIView.
   - Some bugfixes and improvements.
-  - Added CHANGELOG
+  - Added CHANGELOG.
 
 ## v2.1 (Jan 26, 2013)
 
