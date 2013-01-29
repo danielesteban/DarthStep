@@ -1,8 +1,8 @@
-## v2.3 (Feb ??, 2013)
+## v2.3 (Jan 29, 2013)
   
-  - 3D Synths! (almost 4D ;P)
+  - 3D Synths! (I'd say 5D ;P)
   - Accelerometer hardware support.
-  - Alpha version of autoOrientation.
+  - Beta version of autoOrientation.
   - Sampler toggle/clear.
   - Added Makefile.
   - Some bugfixes and improvements.

@@ -15,7 +15,7 @@ This started (an continues) as a learning process... but it turned out to be a p
 
 **Synth Features:**
 
-- Two independent 2D synths (possible even more)
+- Two independent 3D synths (possible even more)
 - Multiple simultaneous waves per synth (Square, Triangle, Saw or Sine)
 - Multiples scales (intervals) pre-programed
 - Octave selection potenciometer
@@ -23,6 +23,8 @@ This started (an continues) as a learning process... but it turned out to be a p
 - ChainSaw
 - Gain Mod
 - Midi Out
+
+The synths could even become 5D if you combine the Touch and the Accelerometer.
 
 **Sampler Features:**
 
