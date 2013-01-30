@@ -28,7 +28,7 @@
   - Optimized Wave library & Samples.
   - A bunch of bugfixes and improvements.
 
-## v2.0 (Dec 29, 2012)
+## v2.0 (Jan 23, 2013)
 
   - The very first of the TFT Touch versions... Already had:
     - The sampler
