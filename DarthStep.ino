@@ -129,7 +129,7 @@ void setUIView(byte view) {
 
 //main funcs
 void setup() {
-	randomSeed(analogRead(A13));
+	randomSeed(analogRead(A15));
 
 	tft.InitLCD(orientation);
 	setUIView(UIView);
