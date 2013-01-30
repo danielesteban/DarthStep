@@ -19,7 +19,7 @@ This started (an continues) as a learning process... but it turned out to be a p
 - Multiple simultaneous waves per synth. (Square, Triangle, Saw or Sine)
 - Multiple pre-programed scales (intervals).
 - Octave/Scale selection.
-- Pitch/Gain/ChainSaw alteration with touch sensor, accelerometer and/or light resistor. (6 axes)
+- Pitch/Gain/ChainSaw alteration with touch sensor, accelerometer and/or photoresistor. (6 axes)
 - Midi Out.
 
 **Sampler Features:**
