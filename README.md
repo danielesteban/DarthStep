@@ -15,20 +15,20 @@ This started (an continues) as a learning process... but it turned out to be a p
 
 **Synth Features:**
 
-- Two independent 3D synths (possible even more)
-- Multiple simultaneous waves per synth (Square, Triangle, Saw or Sine)
-- Multiples pre-programed scales (intervals)
-- Octave/Scale selection potenciometers
-- Pitch/Gain/ChainSaw alteration with touch sensor, accelerometer and/or light resistor (6 axes).
-- Midi Out
+- Two independent 3D synths. (possible even more)
+- Multiple simultaneous waves per synth. (Square, Triangle, Saw or Sine)
+- Multiple pre-programed scales (intervals).
+- Octave/Scale selection.
+- Pitch/Gain/ChainSaw alteration with touch sensor, accelerometer and/or light resistor. (6 axes)
+- Midi Out.
 
 **Sampler Features:**
 
 - 9 Samples. 8Bits. 8khz.
 - Editable 2 bars beats. 64 steps per sample (32 each bar).
-- Variable BPM
+- Variable BPM.
 - Multiple quantization presets.
-- Midi Out
+- Midi Out.
 
 It also has a 3 channel mixer UI with a gain slider and a mute button per channel.
 
