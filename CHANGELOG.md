@@ -3,6 +3,7 @@
   - PhotoResistor support as another synth axis.
   - SetNote refactoring. (removed old selectedNote/note behaviour)
   - #ifdefs refactoring.
+  - Fritzing files updated.
 
 ## v2.3 (Jan 29, 2013)
   

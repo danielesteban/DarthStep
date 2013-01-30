@@ -38,8 +38,6 @@ Both the synth and the sampler allow to record/save/load sequences into an SD Ca
 
 The midi outs are on separate midi channels for convenience, but (like ohter config options) the channel numbers are constants at the top of the arduino sketch.
 
-Note: The fritzing files are from the old GLCD version... I will update them as soon as I get motivated. But the main circuit is pretty much the same.
-
 Inspiration (and some code & schematics) for this project came from:
 
 - http://code.google.com/p/tinkerit/wiki/Auduino
