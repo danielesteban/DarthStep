@@ -17,14 +17,10 @@ This started (an continues) as a learning process... but it turned out to be a p
 
 - Two independent 3D synths (possible even more)
 - Multiple simultaneous waves per synth (Square, Triangle, Saw or Sine)
-- Multiples scales (intervals) pre-programed
-- Octave selection potenciometer
-- ~~Quick pitch alteration light resistor~~ (NYI on the TFT version)
-- ChainSaw
-- Gain Mod
+- Multiples pre-programed scales (intervals)
+- Octave/Scale selection potenciometers
+- Pitch/Gain/ChainSaw alteration with touch sensor, accelerometer and/or light resistor (6 axes).
 - Midi Out
-
-The synths could even become 5D if you combine the Touch and the Accelerometer.
 
 **Sampler Features:**
 

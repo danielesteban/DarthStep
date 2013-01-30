@@ -1,7 +1,8 @@
-## v2.4 (Feb ??, 2013)
+## v2.4 (Jan 30, 2013)
   
-  - LightResistor support as another axis
-  - SetNote refactoring.
+  - LightResistor support as another synth axis.
+  - SetNote refactoring. (removed old behaviour selectedNote/note)
+  - #ifdefs refactoring.
 
 ## v2.3 (Jan 29, 2013)
   

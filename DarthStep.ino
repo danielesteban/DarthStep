@@ -30,7 +30,6 @@ const unsigned int sampleRate = 8000;
 //Lib
 #if defined(pot1Pin) || defined(pot2Pin) || defined(photoResistorPin) || defined(accelerometerXPin) || defined(accelerometerYPin) || defined(accelerometerZPin)
 	#include <AnalogInputs.h>
-	#define inputsInterrupt (TIMER4_COMPA_vect)
 #endif
 #include <Midi.h>
 #include <Wave.h>
@@ -66,15 +65,16 @@ unsigned long photoResistorCalibrateStart = 0;
 #ifdef AnalogInputs_h
 	void onChange(byte pin, int read);
 	AnalogInputs analogInputs(onChange, 25);
-#endif
-#ifdef photoResistorPin
-	void photoResistorOnChange(byte pin, int read);
-	void photoResistorEnable(byte enabled);
-#else
-	#define photoResistorEnable (NULL)
-#endif
-#if defined(accelerometerXPin) || defined(accelerometerYPin) || defined(accelerometerZPin)
-	void accelerometerOnChange(byte pin, int read);
+	#define inputsInterrupt (TIMER4_COMPA_vect)
+	#ifdef photoResistorPin
+		void photoResistorOnChange(byte pin, int read);
+		void photoResistorEnable(byte enabled);
+	#else
+		#define photoResistorEnable (NULL)
+	#endif
+	#if defined(accelerometerXPin) || defined(accelerometerYPin) || defined(accelerometerZPin)
+		void accelerometerOnChange(byte pin, int read);
+	#endif
 #endif
 
 Midi midi(Serial1);
@@ -281,19 +281,12 @@ void screenMenuOnClick(byte id) {
 				case 2:
 					if(!sdStatus) return;
 					renderSequenceLoader();
+					
+					//synths[UIView]->saveSequence();
 				break;
 				case 3:
 					if(synths[UIView]->sequencerStatus == 2) synths[UIView]->clearSequencer();
 					else synths[UIView]->sequencerStatus++;
-					
-					//synths[UIView]->saveSequence();
-					
-					//synths[UIView]->chainSawToggle();
-					//synths[UIView]->gainModToggle();
-
-					//photoResistorCalibrate = 1;
-					//photoResistorEnabled = !photoResistorEnabled;
-					//if(!photoResistorEnabled && !notePotEnabled) synths[UIView]->setNote(255);
 				break;
 				case 4:
 					renderSynthConfig();
@@ -402,71 +395,63 @@ void introOnTouch(byte id) {
 				}
 		}
 	}
-#endif
-
-#ifdef photoResistorPin
-	void photoResistorOnChange(byte pin, int read) {
-		if(!photoResistorEnabled) return;
-		if(photoResistorCalibrate) {
-			if(photoResistorCalibrateStart == 0) {
-				photoResistorCalibrateStart = millis();
-				photoResistorMax = 0;
-				photoResistorMin = 1023;
-			}
-			photoResistorMax < read && (photoResistorMax = read);
-			photoResistorMin > read && (photoResistorMin = read);
-			photoResistorCalibrateStart <= millis() - 2000 && (photoResistorCalibrateStart = photoResistorCalibrate = 0);
-			return;
-		} else if(UIView >= numSynths) return;
-		if(synths[UIView]->axis[5] != 255) synths[UIView]->photoResistor(constrain(read, photoResistorMin, photoResistorMax), photoResistorMin, photoResistorMax);
-	}
-
-	void photoResistorEnable(byte enabled) {
-		if(enabled && !photoResistorEnabled) photoResistorCalibrate = 1;
-		photoResistorEnabled = enabled;
-	}
-#endif
-
-#if defined(accelerometerXPin) || defined(accelerometerYPin) || defined(accelerometerZPin)
-	void accelerometerOnChange(byte pin, int read) {
-		bool ao = autoOrientation;
-
-		#ifdef accelerometerXPin
-			const int x = analogInputs.get(accelerometerXPin)->read;
-		#else
-			const int x = -1;
-		#endif
-		#ifdef accelerometerYPin
-			const int y = analogInputs.get(accelerometerYPin)->read;
-		#else
-			const int y = -1;
-		#endif
-		#ifdef accelerometerZPin
-			const int z = analogInputs.get(accelerometerZPin)->read;
-		#else
-			const int z = -1;
-		#endif
-
-		switch(UIView) {
-			case UIViewSynth1:
-			case UIViewSynth2:
-				if(synths[UIView]->axis[2] != 255 || synths[UIView]->axis[3] != 255 || synths[UIView]->axis[4] != 255) {
-					synths[UIView]->accelerometer(x, y, z);
-					ao = 0;
-				}
-		}
-
-		if(!ao) return;
-		if(y < 450) {
-			if(orientation != LANDSCAPE) setOrientation(LANDSCAPE);
-		} else if(orientation != PORTRAIT) setOrientation(PORTRAIT);
-	}
-#endif
-
-#ifdef AnalogInputs_h
 	ISR(inputsInterrupt) {
 		analogInputs.read();
 	}
+	#ifdef photoResistorPin
+		void photoResistorOnChange(byte pin, int read) {
+			if(!photoResistorEnabled) return;
+			read = 1023 - read;
+			if(photoResistorCalibrate) {
+				if(photoResistorCalibrateStart == 0) {
+					photoResistorCalibrateStart = millis();
+					photoResistorMax = 0;
+					photoResistorMin = 1023;
+				}
+				photoResistorMax < read && (photoResistorMax = read);
+				photoResistorMin > read && (photoResistorMin = read);
+				photoResistorCalibrateStart <= millis() - 2000 && (photoResistorCalibrateStart = photoResistorCalibrate = 0);
+				return;
+			} else if(UIView >= numSynths) return;
+			if(synths[UIView]->axis[5] != 255) synths[UIView]->photoResistor(constrain(read, photoResistorMin, photoResistorMax), photoResistorMin, photoResistorMax);
+		}
+
+		void photoResistorEnable(byte enabled) {
+			if(enabled && !photoResistorEnabled) photoResistorCalibrate = 1;
+			photoResistorEnabled = enabled;
+		}
+	#endif
+	#if defined(accelerometerXPin) || defined(accelerometerYPin) || defined(accelerometerZPin)
+		void accelerometerOnChange(byte pin, int read) {
+			bool ao = autoOrientation;
+
+			#ifdef accelerometerXPin
+				const int x = analogInputs.get(accelerometerXPin)->read;
+			#else
+				const int x = -1;
+			#endif
+			#ifdef accelerometerYPin
+				const int y = analogInputs.get(accelerometerYPin)->read;
+			#else
+				const int y = -1;
+			#endif
+			#ifdef accelerometerZPin
+				const int z = analogInputs.get(accelerometerZPin)->read;
+			#else
+				const int z = -1;
+			#endif
+
+			if(UIView < numSynths && (synths[UIView]->axis[2] != 255 || synths[UIView]->axis[3] != 255 || synths[UIView]->axis[4] != 255)) {
+				synths[UIView]->accelerometer(x, y, z);
+				ao = false;
+			}
+
+			if(!ao) return;
+			if(y < 450) {
+				if(orientation != LANDSCAPE) setOrientation(LANDSCAPE);
+			} else if(orientation != PORTRAIT) setOrientation(PORTRAIT);
+		}
+	#endif
 #endif
 
 ISR(sequencerInterrupt) {
