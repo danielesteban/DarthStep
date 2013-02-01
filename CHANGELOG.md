@@ -1,4 +1,4 @@
-## v2.4 (Jan 30, 2013)
+## v2.4 (Feb 01, 2013)
   
   - PhotoResistor support as another synth axis.
   - SetNote refactoring. (removed old selectedNote/note behaviour)
