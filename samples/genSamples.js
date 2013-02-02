@@ -18,8 +18,8 @@ function genSamples() {
 			i > 0 && samplesFile.write(", ");
 			samplesFile.write('"' + name + '"');
 		});
-		samplesFile.write("};\n\nextern PROGMEM const char * samples[numSamples];");
-		samplesCFile.write("\nPROGMEM const char * samples[numSamples] = {");
+		samplesFile.write("};\n\nextern const char * samples[numSamples];");
+		samplesCFile.write("\nconst char * samples[numSamples] = {");
 		sampleNames.forEach(function(name, i) {
 			i > 0 && samplesCFile.write(", ");
 			samplesCFile.write(name);
