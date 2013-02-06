@@ -1,4 +1,4 @@
-## v2.5 (Feb ??, 2013)
+## v2.5 (Feb 06 2013)
 
   - Sequencer UIView
   - SequencableUI Interface
