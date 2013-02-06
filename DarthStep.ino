@@ -1,3 +1,6 @@
+const char * VERSION = "v2.5";
+//#define DEBUG (1)
+
 //Comment this defines out if you don't want that functionality (or don't have the hardware conected)
 #define pot1Pin (A8) 
 #define pot2Pin (A9)
@@ -5,8 +8,6 @@
 #define accelerometerXPin (A11)
 #define accelerometerYPin (A13)
 #define accelerometerZPin (A14)
-
-//#define DEBUG (1)
 
 //Constants
 const byte numSynths = 2, //changing this one will require some code changes (besides i don't think it will handle more than that).

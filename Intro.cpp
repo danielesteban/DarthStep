@@ -54,9 +54,8 @@ void Intro::render(UTFT tft) {
 
 void Intro::update() {
 	if(_count == 50) return render(_tft);
-	unsigned long t = millis();
 	if(_index == 14) {
-		if(t - _lastFrame < 5000) return;
+		if(millis() - _lastFrame < 5000) return;
 		_index = 0;
 		_yoffset = _xoffset = 10;
 		_count++;
@@ -70,7 +69,11 @@ void Intro::update() {
 	_tft.setColor(random(0, 256), random(0, 256), random(0, 256));
 	for(byte y=0; y<5; y++) _tft.drawPixel(random(0, _tft.getDisplayXSize()), random(0, _tft.getDisplayYSize()));
 	_index++;
-	_index == 14 && (_lastFrame = t);
+	if(_index == 14) {
+		_lastFrame = millis();
+		_tft.setColor(random(65, 128), random(65, 128), random(65, 128));
+		_tft.print(VERSION, _tft.getDisplayXSize() - 32, _tft.getDisplayYSize() - 13);
+	}
 }
 
 void Intro::onTouch(byte orientation, int x, int y) {

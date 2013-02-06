@@ -14,6 +14,8 @@
 #endif
 #include <UI.h>
 
+extern const char * VERSION;
+
 class Intro : public UI {
     public:
         Intro(Callback onTouch);
