@@ -53,8 +53,7 @@ const unsigned int sampleRate = 8000;
 
 //Vars
 byte orientation = LANDSCAPE,
-	UIView = UIViewIntro,
-	nextLoopUIView = 255;
+	UIView = UIViewIntro;
 
 bool photoResistorEnabled = 0,
 	photoResistorCalibrate = 0,
@@ -131,12 +130,7 @@ void setOrientation(byte o, bool force = false, bool redraw = true) {
 	}
 }
 
-void setUIView(byte view, bool nextLoop = false) {
-	if(nextLoop) {
-		nextLoopUIView = view;
-		return;
-	}
-	nextLoopUIView = 255;
+void setUIView(byte view) {
 	UIViews[UIView]->rendered = false;
 	if(UIView == UIViewMixer || UIView == UIViewSynthConfig || UIView == UIViewFileBrowser || UIView == UIViewKeyboard || UIView == UIViewLicense) {
 		delete UIViews[UIView];
@@ -224,10 +218,6 @@ void screenMenuOnClick(byte id);
 //unsigned long lastMemPrint = 0;
 
 void loop(void) {
-	if(nextLoopUIView != 255) {
-		setUIView(nextLoopUIView);
-		return;
-	}
 	if(!sdStatus && UIView == UIViewSequencer && (millis() - lastSdCheck) > 3000) {
 		sdStatus = SD.begin();
 		if(sdStatus) sequencer->updateSdStatus();
@@ -242,16 +232,16 @@ void loop(void) {
 	}*/
 }
 
-void renderKeyboard(StringCallback callback, byte maxLength = 255, bool nextLoop = false) {
+void renderKeyboard(StringCallback callback, byte maxLength = 255) {
 	if(UIViews[UIViewKeyboard] != NULL) delete UIViews[UIViewKeyboard];
 	UIViews[UIViewKeyboard] = new Keyboard(callback, maxLength);
-	setUIView(UIViewKeyboard, nextLoop);
+	setUIView(UIViewKeyboard);
 }
 
-void renderFileBrowser(String title, const char * path, StringCallback callback, bool nextLoop = false) {
+void renderFileBrowser(String title, const char * path, StringCallback callback) {
 	if(UIViews[UIViewFileBrowser] != NULL) delete UIViews[UIViewFileBrowser];
 	UIViews[UIViewFileBrowser] = new FileBrowser(title, path, callback);
-	setUIView(UIViewFileBrowser, nextLoop);
+	setUIView(UIViewFileBrowser);
 }
 
 void renderSynthConfig() {

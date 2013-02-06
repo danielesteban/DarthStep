@@ -43,14 +43,14 @@ void Sequencer::setTempo(unsigned int tempoBpm) {
 void Sequencer::menuOnClick(byte id) {
     switch(id) {
         case 0:
-            if(sdStatus) renderFileBrowser("Sequence Loader", UIView == _numSequencableUIs - 1 ? "/SAMPLER" : "/SYNTH", fileBrowserCallback, true);
+            if(sdStatus) renderFileBrowser("Sequence Loader", UIView == _numSequencableUIs - 1 ? "/SAMPLER" : "/SYNTH", fileBrowserCallback);
         break;
         case 1:
-            if(sdStatus) renderKeyboard(keyboardSaveCallback, 8, true);
+            if(sdStatus) renderKeyboard(keyboardSaveCallback, 8);
         break;
         case 2:
             _sequencableUIs[UIView]->clearSequence();
-            setUIView(UIView, true);
+            setUIView(UIView);
     }
 }
 
@@ -58,7 +58,7 @@ void Sequencer::fileBrowserCallback(String str) {
     char p[str.length() + 1];
     str.toCharArray(p, str.length() + 1);
     _sequencableUIs[UIView]->loadSequence(p);
-    setUIView(UIView, true);
+    setUIView(UIView);
 }
 
 void Sequencer::keyboardSaveCallback(String str) {
@@ -66,7 +66,7 @@ void Sequencer::keyboardSaveCallback(String str) {
     char p[str.length() + 1];
     str.toCharArray(p, str.length() + 1);
     _sequencableUIs[UIView]->saveSequence(p);
-    setUIView(UIView, true);
+    setUIView(UIView);
 }
 
 void Sequencer::updateSdStatus() {
