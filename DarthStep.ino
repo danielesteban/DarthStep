@@ -410,6 +410,7 @@ void introOnTouch() {
 				}
 			break;
 			case UIViewMenu:
+			case UIViewMixer:
 				switch(pin) {
 					#ifdef pot2Pin
 						case pot2Pin:
