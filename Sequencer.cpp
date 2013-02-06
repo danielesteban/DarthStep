@@ -94,10 +94,10 @@ void Sequencer::sequenceLoaderOnClick(byte id) {
 
     String path = UIView == _numSequencableUIs - 1 ? "/SAMPLER/" : "/SYNTH/";
     path += f->name;
+    delete dir;
     char p[path.length()];
     path.toCharArray(p, path.length() + 1);
     _sequencableUIs[UIView]->loadSequence(p);
-    delete dir;
     setUIView(UIView);
 }
 
