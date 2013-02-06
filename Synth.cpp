@@ -201,15 +201,14 @@ void Synth::saveSequence(char * path) {
 	SD.remove(path);
 	File f = SD.open(path, FILE_WRITE);
 	for(byte x=0; x<numTempoSteps; x++) {
-		f.print(_sequencerSteps[x].note);
-		f.print(",");
-		f.print(_sequencerSteps[x].gain);
-		f.print(",");
-		f.println(_sequencerSteps[x].chainSawInterval);
-		//f.print(",");
-		//f.print(_sequencerSteps[x].circle[0]);
-		//f.print(",");
-		//f.println(_sequencerSteps[x].circle[1]);
+		f.write(_sequencerSteps[x].note);
+		f.write(lowByte(_sequencerSteps[x].gain));
+		f.write(highByte(_sequencerSteps[x].gain));
+		f.write(_sequencerSteps[x].chainSawInterval);
+		//f.write(lowByte(_sequencerSteps[x].circle[0]));
+		//f.write(highByte(_sequencerSteps[x].circle[0]));
+		//f.write(lowByte(_sequencerSteps[x].circle[1]));
+		//f.write(highByte(_sequencerSteps[x].circle[1]));
 	}
 	f.close();
 }
@@ -218,43 +217,33 @@ void Synth::loadSequence(char * path) {
 	clearSequence();
 
 	File f = SD.open(path);
-	byte c = 0,
-		x = 0,
-		i = 0;
-
-	char buf[4],
-		ch;
+	byte x = 0,
+		i = 0,
+		v[2] = {0, 0};
 
 	while(f.available() && x < numTempoSteps) {
-		ch = f.read();
-		if(ch == ',' || ch == '\n') {
-			switch(i) {
-				case 0:
-					_sequencerSteps[x].note = atoi(buf);
-				break;
-				case 1:
-					_sequencerSteps[x].gain = atoi(buf);
-				break;
-				case 2:
-					_sequencerSteps[x].chainSawInterval = atoi(buf);
-				break;
-				/*case 3:
-					_sequencerSteps[x].circle[0] = atoi(buf);
-				break;
-				case 4:
-					_sequencerSteps[x].circle[1] = atoi(buf);
-				break;*/
-			}
-			c = 0;
-			for(byte y=0; y<4; y++) buf[y] = NULL;
-			i++;
-			if(i == 3 || ch == '\n') {
-				i = 0;
-				x++;
-			}
-		} else {
-			buf[c] = ch;
-			c++;
+		v[i == 2 || i == 5 || i == 7 ? 1 : 0] = f.read();
+		switch(i) {
+			case 0:
+				_sequencerSteps[x].note = v[0];
+			break;
+			case 2:
+				_sequencerSteps[x].gain = (unsigned int) v[0] + ((unsigned int) v[1] << 8);
+			break;
+			case 3:
+				_sequencerSteps[x].chainSawInterval = v[0];
+			break;
+			/*case 5:
+				_sequencerSteps[x].circle[0] = (unsigned int) v[0] + ((unsigned int) v[1] << 8);
+			break;
+			case 7:
+				_sequencerSteps[x].circle[1] = (unsigned int) v[0] + ((unsigned int) v[1] << 8);
+			break;*/
+		}
+		i++;
+		if(i == 4 /* i == 8 */) {
+			i = 0;
+			x++;
 		}
 	}
 	f.close();
