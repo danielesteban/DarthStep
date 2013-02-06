@@ -128,7 +128,7 @@ void Sampler::loadSequence(char * path) {
 	byte s = 0,
 		x = 0;
 
-	while(f.available() && x < (numTempoSteps * numSamples)) {
+	while(f.available() && s < numSamples) {
 		_sequencerSteps[s][x] = f.read() == 1;
 		x++;
 		if(x == numTempoSteps) {
