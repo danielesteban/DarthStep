@@ -39,6 +39,8 @@ class Sequencer : public Menu {
         static float _tempoStepFloat,
             _tempoIncrement;
         static SequencableUI ** _sequencableUIs;
+        static const byte _numMenuItems = 3; 
+        static String _menuItems[_numMenuItems];
         static void menuOnClick(byte id);
         static void sequenceLoaderOnClick(byte id);
         static void keyboardSaveCallback(String str);

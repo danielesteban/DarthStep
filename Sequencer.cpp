@@ -16,13 +16,14 @@ float Sequencer::_tempoStepFloat,
 
 SequencableUI ** Sequencer::_sequencableUIs;
 
-Sequencer::Sequencer(byte numSequencableUIs, SequencableUI * sequencableUIs[]) : Menu("Sequencer", 3, new String, menuOnClick) {
+String Sequencer::_menuItems[_numMenuItems] = {NULL, NULL, "Clear Sequence"};
+
+Sequencer::Sequencer(byte numSequencableUIs, SequencableUI * sequencableUIs[]) : Menu("Sequencer", _numMenuItems, _menuItems, menuOnClick) {
     _tempoStep = 0;
     _tempoStepFloat = 0;
     setTempo(120);
     _numSequencableUIs = numSequencableUIs;
     _sequencableUIs = sequencableUIs;
-    setLabel(2, "Clear Sequence", false);
 }
 
 void Sequencer::tick() {
