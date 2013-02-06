@@ -321,6 +321,7 @@ void screenMenuOnClick(byte id) {
 			setUIView(sequencer->UIView);
 		break;
 		case UIViewFileBrowser:
+		case UIViewKeyboard:
 			switch(id) {
 				case 4:
 					//for now we only use this from the sequencer, so..
