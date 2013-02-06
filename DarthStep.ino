@@ -226,15 +226,33 @@ void setup() {
 
 void screenMenuOnClick(byte id);
 
+bool testSD() {
+	String f = "/";
+	f += random(9);
+	f += random(9);
+	f += random(9);
+	f += random(9);
+	f += "test";
+	char path[f.length() + 1];
+    f.toCharArray(path, f.length() + 1);
+	File test = SD.open(path, FILE_WRITE);
+	sdStatus = test || test.write((byte) 0);
+	test.close();
+	SD.remove(path);
+	return sdStatus;
+}
+
 void loop(void) {
 	if(nextLoopUIView != 255) {
 		setUIView(nextLoopUIView);
 		return;
 	}
-	if(!sdStatus && UIView == UIViewSequencer && (millis() - lastSdCheck) > 3000) {
-		sdStatus = SD.begin();
-		if(sdStatus) sequencer->updateSdStatus();
-		else lastSdCheck = millis();
+	if(UIView == UIViewSequencer && (millis() - lastSdCheck) > 3000) {
+		if(!sdStatus) {
+			sdStatus = SD.begin();
+			if(sdStatus || testSD()) sequencer->updateSdStatus();
+		} else if(!testSD()) sequencer->updateSdStatus();
+		lastSdCheck = millis();
 	}
 	if(!UIViews[UIView]->rendered) return;
 	UIViews[UIView]->update();
