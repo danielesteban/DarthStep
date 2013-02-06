@@ -1,7 +1,7 @@
 #ifndef Samples_h
 #define Samples_h
 
-#define DEBUG (1)
+//#define DEBUG (1)
 
 #include "Arduino.h"
 #include <avr/pgmspace.h>
