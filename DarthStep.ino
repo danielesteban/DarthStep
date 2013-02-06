@@ -228,7 +228,7 @@ void loop(void) {
 		setUIView(nextLoopUIView);
 		return;
 	}
-	if(!sdStatus && UIView == UIViewSequencer && (millis() - lastSdCheck) > 1000) {
+	if(!sdStatus && UIView == UIViewSequencer && (millis() - lastSdCheck) > 3000) {
 		sdStatus = SD.begin();
 		if(sdStatus) sequencer->updateSdStatus();
 		else lastSdCheck = millis();
