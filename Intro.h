@@ -16,12 +16,12 @@
 
 class Intro : public UI {
     public:
-        Intro(TouchEvent onTouch);
+        Intro(Callback onTouch);
         void render(UTFT tft);
         void update();
     private:
     	UTFT _tft;
-        TouchEvent _onTouch;
+        Callback _onTouch;
 		unsigned long _lastFrame;
 		byte _index,
 			_yoffset,

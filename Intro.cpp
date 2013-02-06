@@ -38,7 +38,7 @@ PROGMEM const char * introTexts[] = {
 	introText14
 };
 
-Intro::Intro(TouchEvent onTouch) {
+Intro::Intro(Callback onTouch) {
 	availableOrientations[PORTRAIT] = 0;
 	_onTouch = onTouch;
 }
@@ -74,5 +74,5 @@ void Intro::update() {
 }
 
 void Intro::onTouch(byte orientation, int x, int y) {
-	_onTouch(255);
+	_onTouch();
 }

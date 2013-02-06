@@ -5,7 +5,7 @@
 
 #include "SynthConfig.h"
 
-SynthConfig::SynthConfig(Synth * synth, TouchEvent photoResistorEnable) : UI() {
+SynthConfig::SynthConfig(Synth * synth, ByteCallback photoResistorEnable) : UI() {
     availableOrientations[PORTRAIT] = _mode = 0;
     _synth = synth;
     _photoResistorEnable = photoResistorEnable;

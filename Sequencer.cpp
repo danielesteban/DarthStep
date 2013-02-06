@@ -43,71 +43,30 @@ void Sequencer::setTempo(unsigned int tempoBpm) {
 void Sequencer::menuOnClick(byte id) {
     switch(id) {
         case 0:
-            if(sdStatus) {
-                Directory * dir = new Directory(UIView == _numSequencableUIs - 1 ? "/SAMPLER" : "/SYNTH");
-                file * f = dir->getFiles();
-
-                byte count = 0,
-                    c = 0;
-
-                while(f != NULL) { //this is really lame, but i'm kinda tired ;P
-                    count++;
-                    f = f->next;
-                }
-                
-                String filenames[count];
-                
-                f = dir->getFiles();
-                while(f != NULL) {
-                    filenames[c] = f->name;
-                    c++;
-                    f = f->next;
-                }
-
-                delete dir;
-
-                const byte UIViewSequenceLoader = 8; //FAIL
-                if(UIViews[UIViewSequenceLoader] != NULL) delete UIViews[UIViewSequenceLoader];
-                UIViews[UIViewSequenceLoader] = new Menu("Load sequence", count, filenames, sequenceLoaderOnClick);
-                setUIView(UIViewSequenceLoader);
-            }
+            if(sdStatus) renderFileBrowser("Sequence Loader", UIView == _numSequencableUIs - 1 ? "/SAMPLER" : "/SYNTH", fileBrowserCallback);
         break;
         case 1:
             if(sdStatus) renderKeyboard(keyboardSaveCallback, 8);
         break;
         case 2:
             _sequencableUIs[UIView]->clearSequence();
-            setUIView(UIView);
+            setUIView(UIView, true);
     }
 }
 
-void Sequencer::sequenceLoaderOnClick(byte id) {
-    Directory * dir = new Directory(UIView == _numSequencableUIs - 1 ? "/SAMPLER" : "/SYNTH");
-    file * f = dir->getFiles();
-
-    byte c = 0;
-
-    while(f != NULL) {
-        if(c == id) break;
-        c++;
-        f = f->next;
-    }
-
-    String path = UIView == _numSequencableUIs - 1 ? "/SAMPLER/" : "/SYNTH/";
-    path += f->name;
-    delete dir;
-    char p[path.length()];
-    path.toCharArray(p, path.length() + 1);
+void Sequencer::fileBrowserCallback(String str) {
+    char p[str.length() + 1];
+    str.toCharArray(p, str.length() + 1);
     _sequencableUIs[UIView]->loadSequence(p);
-    setUIView(UIView);
+    setUIView(UIView, true);
 }
 
 void Sequencer::keyboardSaveCallback(String str) {
     str = (UIView == _numSequencableUIs - 1 ? "/SAMPLER/" : "/SYNTH/") + str + ".SEQ";
-    char p[str.length()];
+    char p[str.length() + 1];
     str.toCharArray(p, str.length() + 1);
     _sequencableUIs[UIView]->saveSequence(p);
-    setUIView(UIView);
+    setUIView(UIView, true);
 }
 
 void Sequencer::updateSdStatus() {

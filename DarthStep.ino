@@ -19,7 +19,7 @@ const byte numSynths = 2, //changing this one will require some code changes (be
 	UIViewIntro = 5,
 	UIViewMixer = 6,
 	UIViewSynthConfig = 7,
-	UIViewSequenceLoader = 8,
+	UIViewFileBrowser = 8,
 	UIViewKeyboard = 9,
 	UIViewLicense = 10;
 
@@ -40,6 +40,7 @@ const unsigned int sampleRate = 8000;
 #include <SD.h>
 #include <Directory.h>
 #include <Menu.h>
+#include <FileBrowser.h>
 #include <Keyboard.h>
 #include "Synth.h"
 #include "SynthConfig.h"
@@ -52,7 +53,8 @@ const unsigned int sampleRate = 8000;
 
 //Vars
 byte orientation = LANDSCAPE,
-	UIView = UIViewIntro;
+	UIView = UIViewIntro,
+	nextLoopUIView = 255;
 
 bool photoResistorEnabled = 0,
 	photoResistorCalibrate = 0,
@@ -100,7 +102,7 @@ const byte numMenuItems = 5;
 String menuItems[numMenuItems] = {"Sampler -->", "Synth 1 -->", "Synth 2 -->", "Mixer -->", "License -->"};
 
 void menuOnClick(byte id);
-void introOnTouch(byte id);
+void introOnTouch();
 
 UI * UIViews[] = {
 	(UI *) synths[0], //UIViewSynth1
@@ -111,7 +113,7 @@ UI * UIViews[] = {
 	(UI *) new Intro(introOnTouch), //UIViewIntro
 	NULL, //UIViewMixer
 	NULL, //UIViewSynthConfig
-	NULL, //UIViewSequenceLoader
+	NULL, //UIViewFileBrowser
 	NULL, //UIViewKeyboard
 	NULL //UIViewLicense
 };
@@ -128,9 +130,13 @@ void setOrientation(byte o, bool force = false, bool redraw = true) {
 	}
 }
 
-void setUIView(byte view) {
+void setUIView(byte view, bool nextLoop = false) {
+	if(nextLoop) {
+		nextLoopUIView = view;
+		return;
+	}
 	UIViews[UIView]->rendered = false;
-	if(UIView == UIViewMixer || UIView == UIViewSynthConfig || UIView == UIViewSequenceLoader || UIView == UIViewKeyboard || UIView == UIViewLicense) {
+	if(UIView == UIViewMixer || UIView == UIViewSynthConfig || UIView == UIViewFileBrowser || UIView == UIViewKeyboard || UIView == UIViewLicense) {
 		delete UIViews[UIView];
 		UIViews[UIView] = NULL;
 	}
@@ -216,6 +222,11 @@ void screenMenuOnClick(byte id);
 //unsigned long lastMemPrint = 0;
 
 void loop(void) {
+	if(nextLoopUIView != 255) {
+		setUIView(nextLoopUIView);
+		nextLoopUIView = 255;
+		return;
+	}
 	if(!UIViews[UIView]->rendered) return;
 	UIViews[UIView]->update();
 	UIViews[UIView]->readTouch(tft, touch, orientation, screenMenuOnClick);
@@ -225,10 +236,16 @@ void loop(void) {
 	}*/
 }
 
-void renderKeyboard(KeyboardEvent callback, byte maxLength = 255) {
+void renderKeyboard(StringCallback callback, byte maxLength = 255) {
 	if(UIViews[UIViewKeyboard] != NULL) delete UIViews[UIViewKeyboard];
 	UIViews[UIViewKeyboard] = new Keyboard(callback, maxLength);
 	setUIView(UIViewKeyboard);
+}
+
+void renderFileBrowser(String title, const char * path, StringCallback callback) {
+	if(UIViews[UIViewFileBrowser] != NULL) delete UIViews[UIViewFileBrowser];
+	UIViews[UIViewFileBrowser] = new FileBrowser(title, path, callback);
+	setUIView(UIViewFileBrowser);
 }
 
 void renderSynthConfig() {
@@ -297,9 +314,10 @@ void screenMenuOnClick(byte id) {
 		case UIViewSequencer:
 			setUIView(sequencer->UIView);
 		break;
-		case UIViewSequenceLoader:
+		case UIViewFileBrowser:
 			switch(id) {
 				case 4:
+					//for now we only use this from the sequencer, so..
 					setUIView(sequencer->UIView);
 			}
 	}
@@ -326,7 +344,7 @@ void menuOnClick(byte id) {
 	}
 }
 
-void introOnTouch(byte id) {
+void introOnTouch() {
 	setUIView(UIViewMenu);
 }
 

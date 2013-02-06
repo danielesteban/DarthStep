@@ -17,14 +17,14 @@
 
 class SynthConfig : public UI {
     public:
-        SynthConfig(Synth * synth, TouchEvent photoResistorEnable = NULL);
+        SynthConfig(Synth * synth, ByteCallback photoResistorEnable = NULL);
         void render(UTFT tft);
         void toggleMode();
         Synth * _synth;
     private:
         UTFT _tft;
         byte _mode;
-        TouchEvent _photoResistorEnable;
+        ByteCallback _photoResistorEnable;
 
         void renderAxis(byte axis);
         void renderWave(byte wave);

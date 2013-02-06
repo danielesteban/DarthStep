@@ -13,15 +13,12 @@
 #include <WProgram.h>
 #endif
 #include <Menu.h>
-#include <Keyboard.h>
-#include <Directory.h>
 #include "sequencableUI.h"
 
-//extern const byte UIViewSequenceLoader; //FAIL
 extern bool sdStatus;
-extern UI * UIViews[];
-extern void setUIView(byte view);
-extern void renderKeyboard(KeyboardEvent callback, byte maxLength);
+extern void setUIView(byte view, bool nextLoop);
+extern void renderFileBrowser(String title, const char * path, StringCallback callback);
+extern void renderKeyboard(StringCallback callback, byte maxLength);
 
 class Sequencer : public Menu {
     public:
@@ -42,7 +39,7 @@ class Sequencer : public Menu {
         static const byte _numMenuItems = 3; 
         static String _menuItems[_numMenuItems];
         static void menuOnClick(byte id);
-        static void sequenceLoaderOnClick(byte id);
+        static void fileBrowserCallback(String str);
         static void keyboardSaveCallback(String str);
 };
 
