@@ -33,7 +33,7 @@ Synth::Synth(int sampleRate, Midi midi, byte midiChannel) : UI(), SequencableUI(
 	_output = 0;
 	gain = (1 << _sampleBits) / 4;
 	for(x=0; x<numWaves; x++) {
-		waveGain[x] = 1 << _sampleBits;
+		//waveGain[x] = 1 << _sampleBits;
  		waves[x] = new Wave(WaveShapeSquare, sampleRate);
  	}
  	axis[3] = _chainSaw = _chainSawLastLoop = _midiEnabled = _selectedRoot = _tempoStep = _touching = mute = 0;
@@ -234,10 +234,10 @@ void Synth::loadSequence(char * path) {
 				_sequencerSteps[x].chainSawInterval = v[0];
 			break;
 			/*case 5:
-				_sequencerSteps[x].circle[0] = (unsigned int) v[0] + ((unsigned int) v[1] << 8);
+				_sequencerSteps[x].circle[0] = (int) v[0] + ((int) v[1] << 8);
 			break;
 			case 7:
-				_sequencerSteps[x].circle[1] = (unsigned int) v[0] + ((unsigned int) v[1] << 8);
+				_sequencerSteps[x].circle[1] = (int) v[0] + ((int) v[1] << 8);
 			break;*/
 		}
 		i++;

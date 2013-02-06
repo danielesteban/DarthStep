@@ -6,6 +6,8 @@
 #define accelerometerYPin (A13)
 #define accelerometerZPin (A14)
 
+//#define DEBUG (1)
+
 //Constants
 const byte numSynths = 2, //changing this one will require some code changes (besides i don't think it will handle more than that).
 	samplerMidiChannel = 1, //set this to wharever channel you want. 0 is all channels.
@@ -32,6 +34,10 @@ const unsigned int sampleRate = 8000;
 //Lib
 #if defined(pot1Pin) || defined(pot2Pin) || defined(photoResistorPin) || defined(accelerometerXPin) || defined(accelerometerYPin) || defined(accelerometerZPin)
 	#include <AnalogInputs.h>
+#endif
+#ifdef DEBUG
+	#include <MemoryFree.h>
+	unsigned long lastMemPrint = 0;
 #endif
 #include <Midi.h>
 #include <Wave.h>
@@ -212,16 +218,12 @@ void setup() {
 
 	sei(); //allow interrupts
 
-	//debug
-	//Serial.begin(115200);
-	//UIViews[UIViewSynthConfig] = new SynthConfig(synths[UIViewSynth1], photoResistorEnable);
-	//setUIView(UIViewSynthConfig);
+	#ifdef DEBUG
+		Serial.begin(115200);
+	#endif
 }
 
 void screenMenuOnClick(byte id);
-
-//#include <MemoryFree.h>
-//unsigned long lastMemPrint = 0;
 
 void loop(void) {
 	if(nextLoopUIView != 255) {
@@ -236,10 +238,12 @@ void loop(void) {
 	if(!UIViews[UIView]->rendered) return;
 	UIViews[UIView]->update();
 	UIViews[UIView]->readTouch(tft, touch, orientation, screenMenuOnClick);
-	/*if(millis() - lastMemPrint > 3000) {
-		lastMemPrint = millis();
-		Serial.println(freeMemory(), DEC);
-	}*/
+	#ifdef DEBUG
+		if(millis() - lastMemPrint > 3000) {
+			lastMemPrint = millis();
+			Serial.println(freeMemory(), DEC);
+		}
+	#endif
 }
 
 void renderKeyboard(StringCallback callback, byte maxLength = 255, bool nextLoop = false) {

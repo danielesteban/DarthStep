@@ -51,8 +51,8 @@ class Synth : public UI, public SequencableUI {
             sequencerStatus,
             axis[6];
 
-        unsigned int gain,
-            waveGain[numWaves];
+        unsigned int gain;
+            //waveGain[numWaves];
 
         bool mute;
 
