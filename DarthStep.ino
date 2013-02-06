@@ -64,7 +64,8 @@ bool photoResistorEnabled = 0,
 unsigned int photoResistorMax = 0,
 	photoResistorMin = 1023;
 
-unsigned long photoResistorCalibrateStart = 0;
+unsigned long photoResistorCalibrateStart = 0,
+	lastSdCheck = 0;
 
 #ifdef AnalogInputs_h
 	void onChange(byte pin, int read);
@@ -222,6 +223,11 @@ void screenMenuOnClick(byte id);
 //unsigned long lastMemPrint = 0;
 
 void loop(void) {
+	if(!sdStatus && (millis() - lastSdCheck) > 10000) {
+		sdStatus = SD.begin();
+		if(sdStatus) sequencer->updateSdStatus();
+		else lastSdCheck = millis();
+	}
 	if(nextLoopUIView != 255) {
 		setUIView(nextLoopUIView);
 		nextLoopUIView = 255;
