@@ -136,6 +136,7 @@ void setUIView(byte view, bool nextLoop = false) {
 		nextLoopUIView = view;
 		return;
 	}
+	nextLoopUIView = 255;
 	UIViews[UIView]->rendered = false;
 	if(UIView == UIViewMixer || UIView == UIViewSynthConfig || UIView == UIViewFileBrowser || UIView == UIViewKeyboard || UIView == UIViewLicense) {
 		delete UIViews[UIView];
@@ -223,15 +224,14 @@ void screenMenuOnClick(byte id);
 //unsigned long lastMemPrint = 0;
 
 void loop(void) {
+	if(nextLoopUIView != 255) {
+		setUIView(nextLoopUIView);
+		return;
+	}
 	if(!sdStatus && (millis() - lastSdCheck) > 10000) {
 		sdStatus = SD.begin();
 		if(sdStatus) sequencer->updateSdStatus();
 		else lastSdCheck = millis();
-	}
-	if(nextLoopUIView != 255) {
-		setUIView(nextLoopUIView);
-		nextLoopUIView = 255;
-		return;
 	}
 	if(!UIViews[UIView]->rendered) return;
 	UIViews[UIView]->update();
