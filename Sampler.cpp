@@ -5,13 +5,13 @@
 
 #include "Sampler.h"
 
-Sampler::Sampler(Midi midi, byte midiChannel) {
+Sampler::Sampler(Midi midi, byte midiChannel) : UI(), SequencableUI() {
 	_midi = midi;
 	_midiChannel = midiChannel;
 	_midiEnabled = selectedSample = _sampleOn = 0;
 	gain = (1 << _sampleBits);
 	mute = 0;
-	clearSampler();
+	clearSequence();
 }
 
 void Sampler::render(UTFT tft) {
@@ -101,6 +101,43 @@ void Sampler::sequencerTick(byte tempoStep) {
 	_tempoStep = tempoStep * _renderedQuantization / numTempoSteps;
 }
 
+void Sampler::clearSequence() {
+	for(byte x=0; x<numSamples; x++) {
+		sampleQuantization[x] = 8;
+		for(byte s=0; s<numTempoSteps; s++) _sequencerSteps[x][s] = 0;
+	}
+	_renderedQuantization = 255;
+}
+
+void Sampler::saveSequence(char * path) {
+	SD.mkdir("/SAMPLER/");
+	File f = SD.open(path, FILE_WRITE);
+	for(byte s=0; s<numSamples; s++) {
+		for(byte x=0; x<numTempoSteps; x++) {
+			f.write(_sequencerSteps[s][x] ? 1 : 0);
+		}
+	}
+	f.close();
+}
+
+void Sampler::loadSequence(char * path) {
+	clearSequence();
+
+	File f = SD.open(path);
+	byte s = 0,
+		x = 0;
+
+	while(f.available() && x < (numTempoSteps * numSamples)) {
+		_sequencerSteps[s][x] = f.read() == 1;
+		x++;
+		if(x == numTempoSteps) {
+			s++;
+			x = 0;
+		}
+	}
+	f.close();
+}
+
 void Sampler::midiToggle() {
 	_midiEnabled = !_midiEnabled;
 }
@@ -115,14 +152,6 @@ void Sampler::toggleSteps() {
 
 void Sampler::clearSample() {
 	for(byte x=0; x<numTempoSteps; x++) _sequencerSteps[selectedSample][x] = 0;
-	_renderedQuantization = 255;
-}
-
-void Sampler::clearSampler() {
-	for(byte x=0; x<numSamples; x++) {
-		sampleQuantization[x] = 8;
-		for(byte s=0; s<numTempoSteps; s++) _sequencerSteps[x][s] = 0;
-	}
 	_renderedQuantization = 255;
 }
 

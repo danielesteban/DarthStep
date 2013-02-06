@@ -26,7 +26,7 @@ prog_uchar scales[(Synth::numNotes - 1) * Synth::numScales] PROGMEM = {
 const String noteNames[12] = {"C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"},
 	scaleNames[Synth::numScales] = {"Aeolian", "Locrian", "Ionian", "Dorian", "Phrygian", "Lydian", "Mixolydia", "MAscMinor", "Raised6th", "Raised5th", "MjrMinor", "Altered", "Arabic"};
 
-Synth::Synth(int sampleRate, Midi midi, byte midiChannel) : UI() {
+Synth::Synth(int sampleRate, Midi midi, byte midiChannel) : UI(), SequencableUI() {
 	byte x;
 	axis[0] = axis[4] = axis[5] = _chainSawInterval = _note = 255;
 	waveOn = 1;
@@ -45,7 +45,7 @@ Synth::Synth(int sampleRate, Midi midi, byte midiChannel) : UI() {
 	_waveNoteOffset[3] = 16;
  	_midi = midi;
  	_midiChannel = midiChannel;
- 	clearSequencer();
+ 	clearSequence();
  	setScale(_selectedScale, _selectedRoot);
 	_circle[0] = _circle[1] = -1;
 }
@@ -162,9 +162,6 @@ void Synth::photoResistor(int read, unsigned int min, unsigned int max) {
 
 void Synth::sequencerTick(byte tempoStep) {
 	switch(sequencerStatus) {
-		case 0: //stopped
-		
-		break;
 		case 1: //recording
 			if(_touching) {
 				(axis[0] == 0 || axis[1] == 0 || axis[2] == 0 || axis[3] == 0 || axis[4] == 0) && (_sequencerSteps[tempoStep].note = _note);
@@ -173,7 +170,7 @@ void Synth::sequencerTick(byte tempoStep) {
 				//_sequencerSteps[tempoStep].circle[0] = _circle[0];
 				//_sequencerSteps[tempoStep].circle[1] = _circle[1];
 			}
-		case 2: //playing
+		case 0: //playing
 			if((!_touching || (axis[0] != 0 && axis[1] != 0 && axis[2] != 0 && axis[3] != 0 && axis[4] != 0)) && _note != _sequencerSteps[tempoStep].note) setNote(_sequencerSteps[tempoStep].note);
 			(!_touching || (axis[0] != 1 && axis[1] != 1 && axis[2] != 1 && axis[3] != 1 && axis[4] != 1)) && (gain = _sequencerSteps[tempoStep].gain);
 			(!_touching || (axis[0] != 2 && axis[1] != 2 && axis[2] != 2 && axis[3] != 2 && axis[4] != 2)) && (_chainSawInterval = _sequencerSteps[tempoStep].chainSawInterval);
@@ -183,9 +180,11 @@ void Synth::sequencerTick(byte tempoStep) {
 			}*/
 	}
 	_tempoStep = tempoStep / 16;
+
+	chainSawTick();
 }
 
-void Synth::clearSequencer() {
+void Synth::clearSequence() {
 	for(byte x=0; x<numTempoSteps; x++) {
 		_sequencerSteps[x].note = 255;
 		_sequencerSteps[x].gain = (1 << _sampleBits) / 4;
@@ -197,53 +196,27 @@ void Synth::clearSequencer() {
 	setNote(255);
 }
 
-void Synth::saveSequence() {
-	SD.mkdir("/SEQS");
-	File f = SD.open("/SEQS/LAST");
-	char buf[4];
-	byte c = 0;
-	while(f.available()) {
-		buf[c] = f.read();
-		c++;
-	}
-	f.close();
-	String last = "";
-	last += atoi(buf) + 1;
-	while(last.length() < 4) last = "0" + last;
-	String path = "/SEQS/";
-	path += last;
-	path += ".seq";
-	char p[path.length()];
-	path.toCharArray(p, path.length() + 1);
-	f = SD.open(p, FILE_WRITE);
-	if(!f) return;
+void Synth::saveSequence(char * path) {
+	SD.mkdir("/SYNTH/");
+	File f = SD.open(path, FILE_WRITE);
 	for(byte x=0; x<numTempoSteps; x++) {
 		f.print(_sequencerSteps[x].note);
 		f.print(",");
 		f.print(_sequencerSteps[x].gain);
 		f.print(",");
-		f.print(_sequencerSteps[x].chainSawInterval);
-		f.print(",");
+		f.println(_sequencerSteps[x].chainSawInterval);
+		//f.print(",");
 		//f.print(_sequencerSteps[x].circle[0]);
-		f.print(",");
+		//f.print(",");
 		//f.println(_sequencerSteps[x].circle[1]);
 	}
 	f.close();
-	SD.remove("/SEQS/LAST");
-	f = SD.open("/SEQS/LAST", FILE_WRITE);
-	f.print(last);
-	f.close();
 }
 
-void Synth::loadSequence(String name) {
-	clearSequencer();
-	
-	String path = "/SEQS/";
-	path += name;
-	char p[path.length()];
-	path.toCharArray(p, path.length() + 1);
+void Synth::loadSequence(char * path) {
+	clearSequence();
 
-	File f = SD.open(p);
+	File f = SD.open(path);
 	byte c = 0,
 		x = 0,
 		i = 0;
@@ -264,17 +237,17 @@ void Synth::loadSequence(String name) {
 				case 2:
 					_sequencerSteps[x].chainSawInterval = atoi(buf);
 				break;
-				case 3:
-					//_sequencerSteps[x].circle[0] = atoi(buf);
+				/*case 3:
+					_sequencerSteps[x].circle[0] = atoi(buf);
 				break;
 				case 4:
-					//_sequencerSteps[x].circle[1] = atoi(buf);
-				break;
+					_sequencerSteps[x].circle[1] = atoi(buf);
+				break;*/
 			}
 			c = 0;
 			for(byte y=0; y<4; y++) buf[y] = NULL;
 			i++;
-			if(i == 5 || ch == '\n') {
+			if(i == 3 || ch == '\n') {
 				i = 0;
 				x++;
 			}
@@ -285,7 +258,7 @@ void Synth::loadSequence(String name) {
 	}
 	f.close();
 
-	sequencerStatus = 2; //play sequence
+	sequencerStatus = 0; //play sequence
 }
 
 void Synth::render(UTFT tft) {

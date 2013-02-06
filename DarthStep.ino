@@ -14,12 +14,14 @@ const byte numSynths = 2, //changing this one will require some code changes (be
 	UIViewSynth1 = 0,
 	UIViewSynth2 = 1,
 	UIViewSampler = 2,
-	UIViewMenu = 3,
-	UIViewIntro = 4,
-	UIViewMixer = 5,
-	UIViewSynthConfig = 6,
-	UIViewSequenceLoader = 7,
-	UIViewLicense = 8;
+	UIViewSequencer = 3,
+	UIViewMenu = 4,
+	UIViewIntro = 5,
+	UIViewMixer = 6,
+	UIViewSynthConfig = 7,
+	UIViewSequenceLoader = 8,
+	UIViewKeyboard = 9,
+	UIViewLicense = 10;
 
 const unsigned int sampleRate = 8000;
 
@@ -38,6 +40,7 @@ const unsigned int sampleRate = 8000;
 #include <SD.h>
 #include <Directory.h>
 #include <Menu.h>
+#include <Keyboard.h>
 #include "Synth.h"
 #include "SynthConfig.h"
 #include "Sampler.h"
@@ -49,8 +52,7 @@ const unsigned int sampleRate = 8000;
 
 //Vars
 byte orientation = LANDSCAPE,
-	UIView = UIViewIntro,
-	sequenceLoaderSynth;
+	UIView = UIViewIntro;
 
 bool photoResistorEnabled = 0,
 	photoResistorCalibrate = 0,
@@ -83,7 +85,12 @@ Synth * synths[numSynths] = {
 	new Synth(sampleRate, midi, synthsMidiChannels[1])
 };
 Sampler * sampler = new Sampler(midi, samplerMidiChannel);
-Sequencer sequencer(numSynths, synths, sampler);
+SequencableUI * sequencableUIs[numSynths + 1] = {
+	synths[0],
+	synths[1],
+	sampler
+};
+Sequencer * sequencer = new Sequencer(numSynths + 1, sequencableUIs);
 
 UTFT tft(ITDB32S, 38, 39, 40, 41);
 UTouch touch(42, 43, 44, 45, 46);
@@ -99,11 +106,13 @@ UI * UIViews[] = {
 	(UI *) synths[0], //UIViewSynth1
 	(UI *) synths[1], //UIViewSynth2
 	(UI *) sampler, //UIViewSampler
+	(UI *) sequencer, //UIViewSequencer
 	new Menu("DarthStep", numMenuItems, menuItems, menuOnClick), //UIViewMenu
 	(UI *) new Intro(introOnTouch), //UIViewIntro
 	NULL, //UIViewMixer
 	NULL, //UIViewSynthConfig
 	NULL, //UIViewSequenceLoader
+	NULL, //UIViewKeyboard
 	NULL //UIViewLicense
 };
 
@@ -121,6 +130,10 @@ void setOrientation(byte o, bool force = false, bool redraw = true) {
 
 void setUIView(byte view) {
 	UIViews[UIView]->rendered = false;
+	if(UIView == UIViewMixer || UIView == UIViewSynthConfig || UIView == UIViewSequenceLoader || UIView == UIViewKeyboard || UIView == UIViewLicense) {
+		delete UIViews[UIView];
+		UIViews[UIView] = NULL;
+	}
 	UIView = view;
 	if(!UIViews[UIView]->availableOrientations[orientation]) return setOrientation(orientation == LANDSCAPE ? PORTRAIT : LANDSCAPE, true);
 	UIViews[UIView]->render(tft);
@@ -159,6 +172,7 @@ void setup() {
 	midi.begin();
 
 	sdStatus = SD.begin();
+	sequencer->updateSdStatus();
 	
 	//set PORTF to all outputs- these bits will be used to send audio data to the R2R DAC
 	DDRF = 0xFF;
@@ -176,7 +190,7 @@ void setup() {
 	TCCR3B = 0;
 	TCCR3B |= (1 << WGM32);
 	TCCR3B |= (1 << CS30); //no prescaler
-	OCR3A = (F_CPU / sequencer.rate) - 1;
+	OCR3A = (F_CPU / sequencer->rate) - 1;
 	TIMSK3 |= (1 << OCIE3A);
 
 	#ifdef AnalogInputs_h
@@ -184,7 +198,7 @@ void setup() {
 		TCCR4B = 0;
 		TCCR4B |= (1 << WGM42);
 		TCCR4B |= (1 << CS40); //no prescaler
-		OCR4A = (F_CPU / (sequencer.rate / 2)) - 1;
+		OCR4A = (F_CPU / (sequencer->rate / 2)) - 1;
 		TIMSK4 |= (1 << OCIE4A);
 	#endif
 
@@ -198,59 +212,23 @@ void setup() {
 
 void screenMenuOnClick(byte id);
 
+//#include <MemoryFree.h>
+//unsigned long lastMemPrint = 0;
+
 void loop(void) {
 	if(!UIViews[UIView]->rendered) return;
 	UIViews[UIView]->update();
 	UIViews[UIView]->readTouch(tft, touch, orientation, screenMenuOnClick);
+	/*if(millis() - lastMemPrint > 3000) {
+		lastMemPrint = millis();
+		Serial.println(freeMemory(), DEC);
+	}*/
 }
 
-void sequenceLoaderOnClick(byte id) {
-	Directory * dir = new Directory("/SEQS");
-	file * f = dir->getFiles();
-
-	byte c = -1;
-
-	while(f != NULL) {
-		strcmp(f->name, "LAST") != 0 && c++;
-		if(c == id) break;
-		f = f->next;
-	}
-
-	synths[sequenceLoaderSynth]->loadSequence(f->name);
-	setUIView(sequenceLoaderSynth);
-
-	delete dir;
-}
-
-void renderSequenceLoader() {
-	Directory * dir = new Directory("/SEQS");
-	file * f = dir->getFiles();
-
-	byte count = 0,
-		c = 0;
-
-	while(f != NULL) { //this is really lame, but i'm kinda tired ;P
-		strcmp(f->name, "LAST") != 0 && count++;
-		f = f->next;
-	}
-	
-	String filenames[count];
-	
-	f = dir->getFiles();
-	while(f != NULL) {
-		if(strcmp(f->name, "LAST") != 0) {
-			filenames[c] = f->name;
-			c++;
-		}
-		f = f->next;
-	}
-
-	delete dir;
-
-	if(UIViews[UIViewSequenceLoader] != NULL) delete UIViews[UIViewSequenceLoader];
-	UIViews[UIViewSequenceLoader] = new Menu("Load sequence", count, filenames, sequenceLoaderOnClick);
-	sequenceLoaderSynth = UIView;
-	setUIView(UIViewSequenceLoader);
+void renderKeyboard(KeyboardEvent callback, byte maxLength = 255) {
+	if(UIViews[UIViewKeyboard] != NULL) delete UIViews[UIViewKeyboard];
+	UIViews[UIViewKeyboard] = new Keyboard(callback, maxLength);
+	setUIView(UIViewKeyboard);
 }
 
 void renderSynthConfig() {
@@ -279,14 +257,11 @@ void screenMenuOnClick(byte id) {
 					synths[UIView]->midiToggle();
 				break;
 				case 2:
-					if(!sdStatus) return;
-					renderSequenceLoader();
-					
-					//synths[UIView]->saveSequence();
+					synths[UIView]->sequencerStatus = synths[UIView]->sequencerStatus == 1 ? 0 : 1;
 				break;
 				case 3:
-					if(synths[UIView]->sequencerStatus == 2) synths[UIView]->clearSequencer();
-					else synths[UIView]->sequencerStatus++;
+					sequencer->UIView = UIView;
+					setUIView(UIViewSequencer);
 				break;
 				case 4:
 					renderSynthConfig();
@@ -301,8 +276,6 @@ void screenMenuOnClick(byte id) {
 				#endif
 				case 4:
 					setUIView(((SynthConfig *) UIViews[UIViewSynthConfig])->_synth == synths[0] ? UIViewSynth1 : UIViewSynth2); //Lame!
-					delete UIViews[UIViewSynthConfig];
-					UIViews[UIViewSynthConfig] = NULL;
 			}
 		break;
 		case UIViewSampler:
@@ -314,18 +287,20 @@ void screenMenuOnClick(byte id) {
 					sampler->toggleSteps();
 				break;
 				case 3:
-					sampler->clearSample();
+					sequencer->UIView = UIView;
+					setUIView(UIViewSequencer);
 				break;
 				case 4:
-					sampler->clearSampler();
+					sampler->clearSample();
 			}
+		break;
+		case UIViewSequencer:
+			setUIView(sequencer->UIView);
 		break;
 		case UIViewSequenceLoader:
 			switch(id) {
 				case 4:
-					setUIView(sequenceLoaderSynth);
-					delete UIViews[UIViewSequenceLoader];
-					UIViews[UIViewSequenceLoader] = NULL;
+					setUIView(sequencer->UIView);
 			}
 	}
 }
@@ -390,7 +365,7 @@ void introOnTouch(byte id) {
 				switch(pin) {
 					#ifdef pot2Pin
 						case pot2Pin:
-							sequencer.setTempo(map(read, 0, 1023, 60, 300));
+							sequencer->setTempo(map(read, 0, 1023, 60, 300));
 					#endif
 				}
 		}
@@ -441,12 +416,12 @@ void introOnTouch(byte id) {
 				const int z = -1;
 			#endif
 
-			if(UIView < numSynths && (synths[UIView]->axis[2] != 255 || synths[UIView]->axis[3] != 255 || synths[UIView]->axis[4] != 255)) {
+			if(UIView < numSynths && synths[UIView]->rendered && (synths[UIView]->axis[2] != 255 || synths[UIView]->axis[3] != 255 || synths[UIView]->axis[4] != 255)) {
 				synths[UIView]->accelerometer(x, y, z);
 				ao = false;
 			}
 
-			if(!ao) return;
+			if(!ao || UIViews[UIView] == NULL) return;
 			if(y < 450) {
 				if(orientation != LANDSCAPE) setOrientation(LANDSCAPE);
 			} else if(orientation != PORTRAIT) setOrientation(PORTRAIT);
@@ -455,8 +430,7 @@ void introOnTouch(byte id) {
 #endif
 
 ISR(sequencerInterrupt) {
-	sequencer.tick();
-	for(byte x=0; x<numSynths; x++) synths[x]->chainSawTick();
+	sequencer->tick();
 }
 
 ISR(audioInterrupt) {

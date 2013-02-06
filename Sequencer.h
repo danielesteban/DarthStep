@@ -1,5 +1,5 @@
 /*
-    Sequencer.h - DarthStep Sequencer logic.
+    Sequencer.h - DarthStep Sequencer logic & UIView.
     Created by Daniel Esteban, January 3, 2013.
 */
 
@@ -12,24 +12,36 @@
 #include <stdlib.h>
 #include <WProgram.h>
 #endif
-#include "Synth.h"
-#include "Sampler.h"
+#include <Menu.h>
+#include <Keyboard.h>
+#include <Directory.h>
+#include "sequencableUI.h"
 
-class Sequencer {
+//extern const byte UIViewSequenceLoader; //FAIL
+extern bool sdStatus;
+extern UI * UIViews[];
+extern void setUIView(byte view);
+extern void renderKeyboard(KeyboardEvent callback, byte maxLength);
+
+class Sequencer : public Menu {
     public:
-        Sequencer(byte numSynths, Synth * synths[], Sampler * sampler);
-        void tick();
-        void setTempo(unsigned int tempoBpm);
+        Sequencer(byte numSequencableUIs, SequencableUI * sequencableUIs[]);
+        void updateSdStatus();
+        static void tick();
+        static void setTempo(unsigned int tempoBpm);
+        static byte UIView;
         static const byte numTempoSteps = 64;
         static const unsigned int rate = 1024;
     private:
-        byte _numSynths,
+        static byte _numSequencableUIs,
             _tempoStep;
-        unsigned int _tempoBpm;
-        float _tempoStepFloat,
+        static unsigned int _tempoBpm;
+        static float _tempoStepFloat,
             _tempoIncrement;
-        Synth ** _synths;
-        Sampler * _sampler;
+        static SequencableUI ** _sequencableUIs;
+        static void menuOnClick(byte id);
+        static void sequenceLoaderOnClick(byte id);
+        static void keyboardSaveCallback(String str);
 };
 
 #endif

@@ -13,6 +13,8 @@
 #include <WProgram.h>
 #endif
 #include <UI.h>
+#include "SequencableUI.h"
+#include "Sequencer.h"
 #include <Wave.h>
 #include <Midi.h>
 #include <SD.h>    
@@ -24,7 +26,7 @@ typedef struct synthSequence {
     //int circle[2];
 } synthSequence;
 
-class Synth : public UI {
+class Synth : public UI, public SequencableUI {
     public:
         Synth(int sampleRate, Midi midi, byte midiChannel);
         void render(UTFT tft);
@@ -32,14 +34,13 @@ class Synth : public UI {
         void setScale(byte id);
         void setOctave(byte id);
         int output();
-        void chainSawTick();
         void midiToggle();
         void accelerometer(int x, int y, int z);
         void photoResistor(int read, unsigned int min, unsigned int max);
         void sequencerTick(byte tempoStep);
-        void clearSequencer();
-        void saveSequence();
-        void loadSequence(String name);
+        void clearSequence();
+        void saveSequence(char * path);
+        void loadSequence(char * path);
 
         static const byte numWaves = 4,
             numNotes = 7,
@@ -86,7 +87,7 @@ class Synth : public UI {
 
         float _timelineW;
 
-        static const byte numTempoSteps = 64; //This should be Sequencer::numTempoSteps
+        static const byte numTempoSteps = Sequencer::numTempoSteps;
 
         synthSequence _sequencerSteps[numTempoSteps];
 
@@ -101,6 +102,7 @@ class Synth : public UI {
 		void renderNote();
         void renderTimeline();
         void renderScale(bool force = false);
+        void chainSawTick();
 };
  
 #endif

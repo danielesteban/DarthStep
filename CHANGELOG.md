@@ -1,3 +1,12 @@
+## v2.5 (Feb ??, 2013)
+
+  - Sequencer UIView
+  - SequencableUI Interface
+  - Save/load/clear unified for sampler and synths.
+  - SD final implementation.
+  - Memory optimizations. also added more debug capabilities.
+  - Bugfixes & improvements.
+
 ## v2.4 (Feb 01, 2013)
   
   - PhotoResistor support as another synth axis.

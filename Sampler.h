@@ -13,23 +13,26 @@
 #include <WProgram.h>
 #endif
 #include <UI.h>
+#include "SequencableUI.h"
+#include "Sequencer.h"
 #include <Midi.h>    
 #include <SD.h>
 #include <Directory.h>
 #include "Samples.h"
 
-class Sampler : public UI {
+class Sampler : public UI, public SequencableUI {
     public:
         Sampler(Midi midi, byte midiChannel);
         void render(UTFT tft);
         void update();
-        void loadSamples();
         int output();
         void sequencerTick(byte tempoStep);
+        void clearSequence();
+        void loadSequence(char * path);
+        void saveSequence(char * path);
         void midiToggle();
         void toggleSteps();
         void clearSample();
-        void clearSampler();
         byte selectedSample,
             sampleQuantization[numSamples];
         unsigned int gain;
@@ -55,7 +58,7 @@ class Sampler : public UI {
         unsigned int _sampleIndex[numSamples],
             _sampleOn;
 
-		static const byte numTempoSteps = 64; //This should be Sequencer::numTempoSteps
+		static const byte numTempoSteps = Sequencer::numTempoSteps;
 
 		bool _sequencerSteps[numSamples][numTempoSteps],
             _midiEnabled;
