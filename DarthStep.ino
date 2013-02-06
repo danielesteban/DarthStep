@@ -242,16 +242,16 @@ void loop(void) {
 	}*/
 }
 
-void renderKeyboard(StringCallback callback, byte maxLength = 255) {
+void renderKeyboard(StringCallback callback, byte maxLength = 255, bool nextLoop = false) {
 	if(UIViews[UIViewKeyboard] != NULL) delete UIViews[UIViewKeyboard];
 	UIViews[UIViewKeyboard] = new Keyboard(callback, maxLength);
-	setUIView(UIViewKeyboard);
+	setUIView(UIViewKeyboard, nextLoop);
 }
 
-void renderFileBrowser(String title, const char * path, StringCallback callback) {
+void renderFileBrowser(String title, const char * path, StringCallback callback, bool nextLoop = false) {
 	if(UIViews[UIViewFileBrowser] != NULL) delete UIViews[UIViewFileBrowser];
 	UIViews[UIViewFileBrowser] = new FileBrowser(title, path, callback);
-	setUIView(UIViewFileBrowser);
+	setUIView(UIViewFileBrowser, nextLoop);
 }
 
 void renderSynthConfig() {

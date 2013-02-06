@@ -17,8 +17,8 @@
 
 extern bool sdStatus;
 extern void setUIView(byte view, bool nextLoop);
-extern void renderFileBrowser(String title, const char * path, StringCallback callback);
-extern void renderKeyboard(StringCallback callback, byte maxLength);
+extern void renderFileBrowser(String title, const char * path, StringCallback callback, bool nextLoop);
+extern void renderKeyboard(StringCallback callback, byte maxLength, bool nextLoop);
 
 class Sequencer : public Menu {
     public:

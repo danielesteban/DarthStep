@@ -43,10 +43,10 @@ void Sequencer::setTempo(unsigned int tempoBpm) {
 void Sequencer::menuOnClick(byte id) {
     switch(id) {
         case 0:
-            if(sdStatus) renderFileBrowser("Sequence Loader", UIView == _numSequencableUIs - 1 ? "/SAMPLER" : "/SYNTH", fileBrowserCallback);
+            if(sdStatus) renderFileBrowser("Sequence Loader", UIView == _numSequencableUIs - 1 ? "/SAMPLER" : "/SYNTH", fileBrowserCallback, true);
         break;
         case 1:
-            if(sdStatus) renderKeyboard(keyboardSaveCallback, 8);
+            if(sdStatus) renderKeyboard(keyboardSaveCallback, 8, true);
         break;
         case 2:
             _sequencableUIs[UIView]->clearSequence();
