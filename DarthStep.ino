@@ -460,6 +460,7 @@ void introOnTouch() {
 
 ISR(sequencerInterrupt) {
 	sequencer->tick();
+	for(byte x=0; x<numSynths; x++) synths[x]->chainSawTick();
 }
 
 ISR(audioInterrupt) {

@@ -150,7 +150,7 @@ void Synth::accelerometer(int x, int y, int z) {
 	const int min = 180, max = 480;
 	if(axis[2] == 0 || axis[3] == 0 || axis[4] == 0) setNote(map(constrain(axis[2] == 0 ? x : axis[3] == 0 ? y : z, min, max), min, max, numNotes * _selectedOctave, (numNotes * (_selectedOctave + 2)) - 1));
 	(axis[2] == 1 || axis[3] == 1 || axis[4] == 1) && (gain = map(constrain(axis[2] == 1 ? x : axis[3] == 1 ? y : z, min, max), min, max, 0, (1 << _sampleBits) / 2));
-	(axis[2] == 2 || axis[3] == 2 || axis[4] == 2) && (_chainSawInterval = map(constrain(axis[2] == 2 ? x : axis[3] == 2 ? y : z, min, max), min, max, 255, 10));
+	(axis[2] == 2 || axis[3] == 2 || axis[4] == 2) && (_chainSawInterval = map(constrain(axis[2] == 2 ? x : axis[3] == 2 ? y : z, min, max), min, max, 255, 10)) && (_chainSawInterval == 255) && (_chainSaw = false);
 }
 
 void Synth::photoResistor(int read, unsigned int min, unsigned int max) {
@@ -164,24 +164,22 @@ void Synth::sequencerTick(byte tempoStep) {
 	switch(sequencerStatus) {
 		case 1: //recording
 			if(_touching) {
-				(axis[0] == 0 || axis[1] == 0 || axis[2] == 0 || axis[3] == 0 || axis[4] == 0) && (_sequencerSteps[tempoStep].note = _note);
-				(axis[0] == 1 || axis[1] == 1 || axis[2] == 1 || axis[3] == 1 || axis[4] == 1) && (_sequencerSteps[tempoStep].gain = gain);
-				(axis[0] == 2 || axis[1] == 2 || axis[2] == 2 || axis[3] == 2 || axis[4] == 2) && (_sequencerSteps[tempoStep].chainSawInterval = _chainSawInterval);
+				(axis[0] == 0 || axis[1] == 0 || axis[2] == 0 || axis[3] == 0 || axis[4] == 0 || axis[5] == 0) && (_sequencerSteps[tempoStep].note = _note);
+				(axis[0] == 1 || axis[1] == 1 || axis[2] == 1 || axis[3] == 1 || axis[4] == 1 || axis[5] == 1) && (_sequencerSteps[tempoStep].gain = gain);
+				(axis[0] == 2 || axis[1] == 2 || axis[2] == 2 || axis[3] == 2 || axis[4] == 2 || axis[5] == 2) && (_sequencerSteps[tempoStep].chainSawInterval = _chainSawInterval);
 				//_sequencerSteps[tempoStep].circle[0] = _circle[0];
 				//_sequencerSteps[tempoStep].circle[1] = _circle[1];
 			}
 		case 0: //playing
-			if((!_touching || (axis[0] != 0 && axis[1] != 0 && axis[2] != 0 && axis[3] != 0 && axis[4] != 0)) && _note != _sequencerSteps[tempoStep].note) setNote(_sequencerSteps[tempoStep].note);
-			(!_touching || (axis[0] != 1 && axis[1] != 1 && axis[2] != 1 && axis[3] != 1 && axis[4] != 1)) && (gain = _sequencerSteps[tempoStep].gain);
-			(!_touching || (axis[0] != 2 && axis[1] != 2 && axis[2] != 2 && axis[3] != 2 && axis[4] != 2)) && (_chainSawInterval = _sequencerSteps[tempoStep].chainSawInterval);
+			if((!_touching || (axis[0] != 0 && axis[1] != 0 && axis[2] != 0 && axis[3] != 0 && axis[4] != 0 && axis[5] != 0)) && _note != _sequencerSteps[tempoStep].note) setNote(_sequencerSteps[tempoStep].note);
+			(!_touching || (axis[0] != 1 && axis[1] != 1 && axis[2] != 1 && axis[3] != 1 && axis[4] != 1 && axis[5] != 1)) && (gain = _sequencerSteps[tempoStep].gain);
+			(!_touching || (axis[0] != 2 && axis[1] != 2 && axis[2] != 2 && axis[3] != 2 && axis[4] != 2 && axis[5] != 2)) && (_chainSawInterval = _sequencerSteps[tempoStep].chainSawInterval) && (_chainSawInterval == 255) && (_chainSaw = false);
 			/*if(!_touching) {
 				_circle[0] = _sequencerSteps[tempoStep].circle[0];
 				_circle[1] = _sequencerSteps[tempoStep].circle[1];
 			}*/
 	}
 	_tempoStep = tempoStep / 16;
-
-	chainSawTick();
 }
 
 void Synth::clearSequence() {
@@ -279,7 +277,7 @@ void Synth::update() {
 void Synth::onTouch(byte orientation, int x, int y) {
 	if(axis[0] == 0 || axis[1] == 0) setNote(map(axis[1] == 0 ? y : x, (axis[1] == 0 ? _tft.getDisplayYSize() - 1 : 0), (axis[1] == 0 ? 0 : _tft.getDisplayXSize() - 1), numNotes * _selectedOctave, (numNotes * (_selectedOctave + 2)) - 1));
 	(axis[0] == 1 || axis[1] == 1) && (gain = map(axis[0] == 1 ? x : y, (axis[0] == 1 ? 0 : _tft.getDisplayYSize() - 1), (axis[0] == 1 ? _tft.getDisplayXSize() - 1 : 0), 0, (1 << _sampleBits) / 2));
-	(axis[0] == 2 || axis[1] == 2) && (_chainSawInterval = map(axis[0] == 2 ? x : y, (axis[0] == 2 ? 0 : _tft.getDisplayYSize() - 1), (axis[0] == 2 ? _tft.getDisplayXSize() - 1 : 0), 255, 10));
+	(axis[0] == 2 || axis[1] == 2) && (_chainSawInterval = map(axis[0] == 2 ? x : y, (axis[0] == 2 ? 0 : _tft.getDisplayYSize() - 1), (axis[0] == 2 ? _tft.getDisplayXSize() - 1 : 0), 255, 10)) && (_chainSawInterval == 255) && (_chainSaw = false);
 	x < 10 && (x = 10);
 	x > _tft.getDisplayXSize() - 11 && (x = _tft.getDisplayXSize() - 11);
 	y < 10 && (y = 10);

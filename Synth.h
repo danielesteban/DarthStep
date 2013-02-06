@@ -41,6 +41,7 @@ class Synth : public UI, public SequencableUI {
         void clearSequence();
         void saveSequence(char * path);
         void loadSequence(char * path);
+        void chainSawTick();
 
         static const byte numWaves = 4,
             numNotes = 7,
@@ -102,7 +103,6 @@ class Synth : public UI, public SequencableUI {
 		void renderNote();
         void renderTimeline();
         void renderScale(bool force = false);
-        void chainSawTick();
 };
  
 #endif
