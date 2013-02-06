@@ -111,6 +111,7 @@ void Sampler::clearSequence() {
 
 void Sampler::saveSequence(char * path) {
 	SD.mkdir("/SAMPLER/");
+	SD.remove(path);
 	File f = SD.open(path, FILE_WRITE);
 	for(byte s=0; s<numSamples; s++) {
 		for(byte x=0; x<numTempoSteps; x++) {

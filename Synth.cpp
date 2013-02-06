@@ -198,6 +198,7 @@ void Synth::clearSequence() {
 
 void Synth::saveSequence(char * path) {
 	SD.mkdir("/SYNTH/");
+	SD.remove(path);
 	File f = SD.open(path, FILE_WRITE);
 	for(byte x=0; x<numTempoSteps; x++) {
 		f.print(_sequencerSteps[x].note);
