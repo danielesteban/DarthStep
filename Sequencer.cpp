@@ -16,7 +16,7 @@ float Sequencer::_tempoStepFloat,
 
 SequencableUI ** Sequencer::_sequencableUIs;
 
-String Sequencer::_menuItems[_numMenuItems] = {NULL, NULL, "Clear Sequence"};
+String Sequencer::_menuItems[_numMenuItems] = {"", "", "Clear Sequence"};
 
 Sequencer::Sequencer(byte numSequencableUIs, SequencableUI * sequencableUIs[]) : Menu("Sequencer", _numMenuItems, _menuItems, menuOnClick) {
     _tempoStep = 0;
