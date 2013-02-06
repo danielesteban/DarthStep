@@ -3,9 +3,9 @@
   - Sequencer UIView
   - SequencableUI Interface
   - Save/load/clear unified for sampler and synths with new file browser.
-  - SD final implementation.
+  - SD final implementation with hotswap.
   - Memory optimizations. also added more debug capabilities.
-  - Bugfixes & improvements.
+  - Bugfixes & improvements. Fixed some memory leaks.
 
 ## v2.4 (Feb 01, 2013)
   
