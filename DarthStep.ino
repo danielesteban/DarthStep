@@ -234,7 +234,7 @@ bool testSD() {
 	f += random(9);
 	f += "test";
 	char path[f.length() + 1];
-    f.toCharArray(path, f.length() + 1);
+	f.toCharArray(path, f.length() + 1);
 	File test = SD.open(path, FILE_WRITE);
 	sdStatus = test || test.write((byte) 0);
 	test.close();
