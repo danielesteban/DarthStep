@@ -300,17 +300,17 @@ void screenMenuOnClick(byte id) {
 		case UIViewSynth2:
 			switch(id) {
 				case 1:
-					synths[UIView]->midiToggle();
-				break;
-				case 2:
 					synths[UIView]->sequencerStatus = synths[UIView]->sequencerStatus == 1 ? 0 : 1;
 				break;
+				case 2:
+					synths[UIView]->midiToggle();
+				break;
 				case 3:
-					sequencer->UIView = UIView;
-					setUIView(UIViewSequencer);
+					renderSynthConfig();
 				break;
 				case 4:
-					renderSynthConfig();
+					sequencer->UIView = UIView;
+					setUIView(UIViewSequencer);
 			}
 		break;
 		case UIViewSynthConfig:
@@ -327,17 +327,17 @@ void screenMenuOnClick(byte id) {
 		case UIViewSampler:
 			switch(id) {
 				case 1:
-					sampler->midiToggle();
-				break;
-				case 2:
 					sampler->toggleSteps();
 				break;
+				case 2:
+					sampler->midiToggle();
+				break;
 				case 3:
-					sequencer->UIView = UIView;
-					setUIView(UIViewSequencer);
+					sampler->clearSample();
 				break;
 				case 4:
-					sampler->clearSample();
+					sequencer->UIView = UIView;
+					setUIView(UIViewSequencer);
 			}
 		break;
 		case UIViewSequencer:

@@ -55,7 +55,8 @@ class Synth : public UI, public SequencableUI {
         unsigned int gain;
             //waveGain[numWaves];
 
-        bool mute;
+        bool mute,
+            mixerGain;
 
         Wave * waves[numWaves];
     private:

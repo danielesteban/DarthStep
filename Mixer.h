@@ -29,7 +29,7 @@ class Mixer : public UI {
       
       unsigned long _lastFrame;
 
-      byte renderedGains[3];
+      unsigned int renderedGains[3];
 
   		void renderSlider(byte id, int gain);
   		void renderMute(byte id);

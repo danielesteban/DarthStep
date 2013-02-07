@@ -36,7 +36,7 @@ Synth::Synth(int sampleRate, Midi midi, byte midiChannel) : UI(), SequencableUI(
 		//waveGain[x] = 1 << _sampleBits;
  		waves[x] = new Wave(WaveShapeSquare, sampleRate);
  	}
- 	axis[3] = _chainSaw = _chainSawLastLoop = _midiEnabled = _selectedRoot = _tempoStep = _touching = mute = 0;
+ 	axis[3] = _chainSaw = _chainSawLastLoop = _midiEnabled = _selectedRoot = _tempoStep = _touching = mute = mixerGain = 0;
  	axis[1] = _selectedOctave = _selectedScale = 1;
 	axis[2] = 2;
 	_waveNoteOffset[0] = 0;
@@ -172,7 +172,7 @@ void Synth::sequencerTick(byte tempoStep) {
 			}
 		case 0: //playing
 			if((!_touching || (axis[0] != 0 && axis[1] != 0 && axis[2] != 0 && axis[3] != 0 && axis[4] != 0 && axis[5] != 0)) && _note != _sequencerSteps[tempoStep].note) setNote(_sequencerSteps[tempoStep].note);
-			(!_touching || (axis[0] != 1 && axis[1] != 1 && axis[2] != 1 && axis[3] != 1 && axis[4] != 1 && axis[5] != 1)) && (gain = _sequencerSteps[tempoStep].gain);
+			((!_touching && !mixerGain) || (axis[0] != 1 && axis[1] != 1 && axis[2] != 1 && axis[3] != 1 && axis[4] != 1 && axis[5] != 1)) && (gain = _sequencerSteps[tempoStep].gain);
 			(!_touching || (axis[0] != 2 && axis[1] != 2 && axis[2] != 2 && axis[3] != 2 && axis[4] != 2 && axis[5] != 2)) && (_chainSawInterval = _sequencerSteps[tempoStep].chainSawInterval) && (_chainSawInterval == 255) && (_chainSaw = false);
 			/*if(!_touching) {
 				_circle[0] = _sequencerSteps[tempoStep].circle[0];
@@ -278,6 +278,7 @@ void Synth::onTouch(byte orientation, int x, int y) {
 	if(axis[0] == 0 || axis[1] == 0) setNote(map(axis[1] == 0 ? y : x, (axis[1] == 0 ? _tft.getDisplayYSize() - 1 : 0), (axis[1] == 0 ? 0 : _tft.getDisplayXSize() - 1), numNotes * _selectedOctave, (numNotes * (_selectedOctave + 2)) - 1));
 	(axis[0] == 1 || axis[1] == 1) && (gain = map(axis[0] == 1 ? x : y, (axis[0] == 1 ? 0 : _tft.getDisplayYSize() - 1), (axis[0] == 1 ? _tft.getDisplayXSize() - 1 : 0), 0, (1 << _sampleBits) / 2));
 	(axis[0] == 2 || axis[1] == 2) && (_chainSawInterval = map(axis[0] == 2 ? x : y, (axis[0] == 2 ? 0 : _tft.getDisplayYSize() - 1), (axis[0] == 2 ? _tft.getDisplayXSize() - 1 : 0), 255, 10)) && (_chainSawInterval == 255) && (_chainSaw = false);
+	mixerGain && (axis[0] == 1 || axis[1] == 1 || axis[2] == 1 || axis[3] == 1 || axis[4] == 1 || axis[5] == 1) && (mixerGain = 0);
 	x < 10 && (x = 10);
 	x > _tft.getDisplayXSize() - 11 && (x = _tft.getDisplayXSize() - 11);
 	y < 10 && (y = 10);

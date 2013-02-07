@@ -9,7 +9,7 @@ Sampler::Sampler(Midi midi, byte midiChannel) : UI(), SequencableUI() {
 	_midi = midi;
 	_midiChannel = midiChannel;
 	_midiEnabled = selectedSample = _sampleOn = 0;
-	gain = (1 << _sampleBits);
+	gain = (1 << _sampleBits) * 1.25;
 	mute = 0;
 	clearSequence();
 }
